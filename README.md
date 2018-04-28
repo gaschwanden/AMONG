@@ -38,7 +38,10 @@ macro-level visualisation outputs of the model.
 made available to policy-makers and planners, with opportunity for individual to input their own assumptions and policy-scenarios
 The project aims to conclude the first 4 steps within 2 months. The software implementation and verification (steps 5 and 6) will take up to 4 months during which most of the costs occur. Running multiple experiments, generating results and evaluating them (Steps 7 – 9) is anticipated to take 3 months.
 
-![alt text](https://github.com/gaschwanden/AMONG/blob/master/stuff/class_diagram.png)
+## Agent Desicision Process
+
+![alt text](https://github.com/gaschwanden/AMONG/blob/master/stuff/decision.png)
+
 
 
 ## Project Goal
