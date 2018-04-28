@@ -6,6 +6,7 @@ This need not be the case.
 
 Given the known structure of the housing market and actors contained within it (e.g., buyers, sellers, renters), this project builds a transparent, dynamic agent-based model that re-creates the Australian housing market from the ‘bottom-up’.
 
+
 ## Project Pipeline
 
 The project creates a fine-grained representation of the housing market including all relevant actors, (e.g., buyers, sellers, investors, builders, lenders and policy-makers) relevant to the Australian housing industry. The agent-based model will be built to reflect raw figures contained within existing ‘top-down’ models constructed by existing independent analyses to ensure consistency with ‘baseline’ assumptions.
@@ -37,7 +38,10 @@ macro-level visualisation outputs of the model.
 made available to policy-makers and planners, with opportunity for individual to input their own assumptions and policy-scenarios
 The project aims to conclude the first 4 steps within 2 months. The software implementation and verification (steps 5 and 6) will take up to 4 months during which most of the costs occur. Running multiple experiments, generating results and evaluating them (Steps 7 – 9) is anticipated to take 3 months.
 
-## Project Description
+![alt text](https://github.com/gaschwanden/AMONG/blob/master/stuff/class_diagram.png)
+
+
+## Project Goal
 
 This project aims to produce a transparent evaluation methodology to estimate the impact of policy changes associated with changes to the Australian negative gearing and capital gains tax regime. The research question is: How can we most effectively model the impact of policy changes to the housing market.
 Access to safe and secure housing is a basic human right. Unfortunately, however, the current political debate around affordable housing and how it may best be achieved is fraught, with opinionated conversations around negative gearing and capital gains tax at the centre of this debate.
