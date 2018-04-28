@@ -1,0 +1,24 @@
+later: first priority should be data collection and event checking
+
+1000 P timeSinceTransaction
+999 H taxes
+998 H cashflow
+997 H makeDecision
+996 H executeDecision
+995 PM executeAuctions
+
+994 U growPopulation
+993 U dataCollection
+992 U eventChecker
+
+2 U printBalance (TEMP)
+1 U printSeparator (TEMP)
+
+r_return = v/V * R_return
+-> rental income is very dynamic, how do we handle it?
+
+
+
+
+Interesting social/policy tests:
+-redistribute inheritance upon death - universal basic income: would it take longer for people to become investors? Or would we have almost none? What would be the overall loss of taxes? What would be the overall increase in spending power?

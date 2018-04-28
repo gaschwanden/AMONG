@@ -1,0 +1,58 @@
+<repast.simphony.data2.engine.DataSetDescriptor>
+  <name>Auctions</name>
+  <type>AGGREGATE</type>
+  <inclTick>true</inclTick>
+  <inclBatchRun>false</inclBatchRun>
+  <inclRandomSeed>false</inclRandomSeed>
+  <scheduleParams>
+    <start>1.0</start>
+    <interval>1.0</interval>
+    <priority>-Infinity</priority>
+    <pType>LAST</pType>
+    <duration>-1.0</duration>
+    <frequency>REPEAT</frequency>
+    <hashCode>-1378522030</hashCode>
+  </scheduleParams>
+  <atEnd>false</atEnd>
+  <methodDataSources class="linked-hash-map">
+    <entry>
+      <string>Auctions</string>
+      <repast.simphony.data2.engine.MethodDataSourceDefinition>
+        <id>Auctions</id>
+        <className>among.PropertyMarket</className>
+        <methodName>getAuctionsTotal</methodName>
+        <aggType>SUM</aggType>
+      </repast.simphony.data2.engine.MethodDataSourceDefinition>
+    </entry>
+    <entry>
+      <string>Completed</string>
+      <repast.simphony.data2.engine.MethodDataSourceDefinition>
+        <id>Completed</id>
+        <className>among.PropertyMarket</className>
+        <methodName>getAuctionsCompleted</methodName>
+        <aggType>SUM</aggType>
+      </repast.simphony.data2.engine.MethodDataSourceDefinition>
+    </entry>
+    <entry>
+      <string>Remaining</string>
+      <repast.simphony.data2.engine.MethodDataSourceDefinition>
+        <id>Remaining</id>
+        <className>among.PropertyMarket</className>
+        <methodName>getAuctionsRemaining</methodName>
+        <aggType>SUM</aggType>
+      </repast.simphony.data2.engine.MethodDataSourceDefinition>
+    </entry>
+    <entry>
+      <string>By developer</string>
+      <repast.simphony.data2.engine.MethodDataSourceDefinition>
+        <id>By developer</id>
+        <className>among.PropertyMarket</className>
+        <methodName>getAuctionsDeveloper</methodName>
+        <aggType>SUM</aggType>
+      </repast.simphony.data2.engine.MethodDataSourceDefinition>
+    </entry>
+  </methodDataSources>
+  <countSources class="linked-hash-map"/>
+  <customNADataSources class="linked-hash-map"/>
+  <customAggDataSources class="linked-hash-map"/>
+</repast.simphony.data2.engine.DataSetDescriptor>
