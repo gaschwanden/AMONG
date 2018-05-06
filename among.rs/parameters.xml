@@ -6,6 +6,25 @@
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
 		/>
+		<parameter name="policyShock" displayName="Policy shock" type="int" 
+						defaultValue="2500" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+									
+		/>
+		<parameter name="CGTMagnitude" displayName="CGT shock magnitutde" type="double" 
+						defaultValue="0.0" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+									
+		/>
+		<parameter name="NGMagnitude" displayName="NG shock magnitutde" type="double" 
+						defaultValue="0.0" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+									
+		/>
+		
 				<parameter name="demandMagnitude" displayName="Demand shock magnitude" type="double" 
 						defaultValue="0.2" 
 						isReadOnly="false" 

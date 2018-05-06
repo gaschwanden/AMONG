@@ -23,6 +23,7 @@ public class Property implements Comparable<Property>{
 	private double value;
 	private double value_transaction;
 	private double value_previous_transaction;
+	public Integer timeOnMarket = 0;
 
 	private double rent;
 	private double cost;
@@ -45,9 +46,7 @@ public class Property implements Comparable<Property>{
 		value_projected = value;
 		value_transaction = value;
 		value_previous_transaction = value;
-		System.out.println("Property "+ID);
-		System.out.println("value_transaction = "+value_transaction);
-
+		
 		cost = value * CONST.maintenance;
 		rent = value * CONST.rentReturn;
 
@@ -64,8 +63,6 @@ public class Property implements Comparable<Property>{
 		value_projected = value;
 		value_transaction = value;
 		value_previous_transaction = value;
-		System.out.println("Property "+ ID);
-		System.out.println("Value = "+value);
 
 		cost = value * CONST.maintenance;
 		rent = value * CONST.rentReturn;
@@ -86,21 +83,15 @@ public class Property implements Comparable<Property>{
 	public void resetTimeSinceTransaction(){
 		time_since_transaction_previous = time_since_transaction;
 		time_since_transaction = 0;
+		timeOnMarket = 0;
+	}
+	
+	public void increaseTimeOnMarket(){
+		timeOnMarket++;
 	}
 
 	public void setValue(double v){
-
-		//		if (v!=value){
-//		System.out.println("ID ="+ ID);
-//		System.out.println("befor value_previous = "+value_previous);
-//		System.out.println("befor value = "+value);
-//		System.out.println("befor v = "+v);
-//		System.out.println("befor value_transaction = "+value_transaction);
-		//		}
-		
-		
 		annualAppreciation = Math.pow(v/value, 1/(time_since_transaction/CONST.year_ticks))-1;
-		System.out.println("annualAppreciation "+annualAppreciation+" over "+time_since_transaction+" ticks");
 		value_previous = value;
 		value = v;
 		value_previous_transaction = value_transaction;
@@ -164,8 +155,6 @@ public class Property implements Comparable<Property>{
 	}
 
 	public int getPreviousTimeSinceTransaction(){
-		//		if(time_since_transaction_previous>RunEnvironment.getInstance().getCurrentSchedule().getTickCount())time_since_transaction_previous=(int) RunEnvironment.getInstance().getCurrentSchedule().getTickCount();
-		if(ID==14)System.out.println("time since"+time_since_transaction_previous);
 		return time_since_transaction_previous;
 	}
 

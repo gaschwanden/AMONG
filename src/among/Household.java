@@ -247,8 +247,10 @@ public class Household implements Comparable<Household>{
 				double projected = p.getValueProjected();
 
 				double margin = (projected - current) * scale;
-				double reserve_price = current + margin;
-
+				double timeOnMarketMultiplicator = Math.pow(1-CONST.reducedReserve/100,p.timeOnMarket/CONST.year_ticks);
+				double reserve_price = current + margin;// add history of how long it is on the market
+				reserve_price = reserve_price*timeOnMarketMultiplicator;
+//				if(p.timeOnMarket!=0)System.out.println("timeOnMarketDepriciation = "+timeOnMarketMultiplicator);
 				if(p.getTimeSinceTransaction() > investment_horizon * CONST.year_ticks 
 						|| current - 2*global.property_market.transactionCostBuyer(p.getValue()) == p.getValue()
 						|| assets < 0){
@@ -256,6 +258,7 @@ public class Household implements Comparable<Household>{
 						reserve_price -= reserve_price * CONST.reducedReserve;
 					}
 					global.property_market.registerPropertyForSale(this, p, reserve_price);
+					p.timeOnMarket++;
 					return;
 				}
 			}
@@ -329,11 +332,11 @@ public class Household implements Comparable<Household>{
 		
 		double actual_bid = 0;
 		
-		if(Math.random()<0.8){
+//		if(Math.random()<0.8){
 			actual_bid = calculateBidByTime(p);
-		}else {
-			actual_bid = calculateBidByNeighbors(p);
-		}
+//		}else {
+//			actual_bid = calculateBidByNeighbors(p);
+//		}
 
 		return actual_bid;
 	}
@@ -367,6 +370,11 @@ public class Household implements Comparable<Household>{
 
 	private double calculateBidByTime(Property p) {
 		boolean optimist = global.rnd.nextBoolean();
+		if(Math.random()< CONST.optimism){
+			optimist = true;
+		}else{
+			optimist = false;
+		}
 
 		int time = p.getTimeSinceTransaction();
 

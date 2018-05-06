@@ -37,9 +37,12 @@ public class Universe {
 	private boolean supply_shock;
 	private boolean demand_shock;
 	private boolean income_shock;
+	private boolean policy_shock;
 	private double previous_supply;
 	private double previous_demand;
 	private double previous_income;
+	private double previous_NG;
+	private double previous_CGT;
 	
 	public Universe(long seed){
 		rnd = new Random(seed);
@@ -157,6 +160,26 @@ public class Universe {
 			income_shock = false;
 		}
 		
+//		if(policy_shock){
+//			VAR.CGTDiscount = previous_CGT;
+//			
+//		}
+		
+		if(tick == (double)params.getInteger("policyShock")){
+			
+			System.out.println("Policy Shock!");
+			previous_CGT = VAR.CGTDiscount;
+			previous_NG = VAR.negativeGearing;
+			policy_shock = true;
+			System.out.println();
+			System.out.println("Negative Gearing old = "+VAR.negativeGearing);
+			System.out.println("CGT Discount old = "+VAR.CGTDiscount);
+			VAR.CGTDiscount = params.getDouble("CGTMagnitude");
+			VAR.negativeGearing = params.getDouble("NGMagnitude");
+			System.out.println("Negative Gearing new = "+VAR.negativeGearing);
+			System.out.println("CGT Discount new = "+VAR.CGTDiscount);
+		}
+		
 		if(tick == (double)params.getInteger("shockSupply")){
 			previous_supply = VAR.propertyGrowth;
 			supply_shock = true;
@@ -240,7 +263,7 @@ public class Universe {
 	@ScheduledMethod(start = 1, interval = 1, priority = 1)
 	public void printSeparator(){
 		double tick = RunEnvironment.getInstance().getCurrentSchedule().getTickCount();
-		System.out.println("TICK "+tick+"\n");
+//		System.out.println("TICK "+tick+"\n");
 	}
 	
 	public void initialize(){

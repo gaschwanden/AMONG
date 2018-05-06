@@ -5,6 +5,7 @@ public class CONST {
 	public static int property_ID = 0;
 	public static int run = 1;
 	public static double dErr = 0.001;
+	public static double optimism = 0.50; //outlook of households:  0.0 pessimism / 1.0 optimism
 	
 	public static double year_ticks = 52; // Weeks per year
 	public static double tick_limit = 1000; // 2000 or 5200
