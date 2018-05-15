@@ -332,11 +332,11 @@ public class Household implements Comparable<Household>{
 		
 		double actual_bid = 0;
 		
-//		if(Math.random()<0.8){
+		if(Math.random()<0.8){
 			actual_bid = calculateBidByTime(p);
-//		}else {
-//			actual_bid = calculateBidByNeighbors(p);
-//		}
+		}else {
+			actual_bid = calculateBidByNeighbors(p);
+		}
 
 		return actual_bid;
 	}
