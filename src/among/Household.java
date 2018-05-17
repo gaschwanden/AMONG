@@ -15,7 +15,7 @@ import repast.simphony.engine.schedule.ScheduledMethod;
  * Class to encapsulate a Household. 
  * Can own a number of Properties. 
  * Can decide to sell or buy Properties and make Bids on Auctions in the PropertyMarket.
- * @author Friedrich Burkhard von der Osten, PhD Artificial Intelligence, The University of Melbourne
+ * @author Gideon Aschwanden && Friedrich Burkhard von der Osten
  */
 public class Household implements Comparable<Household>{
 
