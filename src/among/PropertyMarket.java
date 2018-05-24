@@ -11,7 +11,7 @@ import repast.simphony.engine.schedule.ScheduledMethod;
  * Central class of the AMONG simulation.
  * Regulates the trading of Properties between Households with an auctioning system.
  * Properties can be offered for sale and Households can make Bids on the Auctions.
- * @author Friedrich Burkhard von der Osten, PhD Artificial Intelligence, The University of Melbourne
+ * @author Gideon Aschwanden && Friedrich Burkhard von der Osten
  */
 public class PropertyMarket {
 	

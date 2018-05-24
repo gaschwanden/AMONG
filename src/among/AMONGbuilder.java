@@ -9,7 +9,7 @@ import repast.simphony.parameter.Parameters;
  * Class to set up a scenario within Repast using runtime parameters.
  * A list of Households owning a number of properties is connected to a PropertyMarket. 
  * Households can buy and sell Properties.
- * @author Friedrich Burkhard von der Osten, PhD Artificial Intelligence, The University of Melbourne
+ * @author Gideon Aschwanden && Friedrich Burkhard von der Osten
  */
 public class AMONGbuilder implements ContextBuilder<Object>{
 

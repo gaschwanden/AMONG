@@ -15,7 +15,7 @@ import repast.simphony.util.collections.IndexedIterable;
 /**
  * Class to hold all objects in the simulation
  * Provides auxiliary methods and global events, as well as data collection
- * @author Friedrich Burkhard von der Osten, PhD Artificial Intelligence, The University of Melbourne
+ * @author Gideon Aschwanden && Friedrich Burkhard von der Osten
  */
 public class Universe {
 	

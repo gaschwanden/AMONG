@@ -8,7 +8,7 @@ import repast.simphony.engine.schedule.ScheduledMethod;
 /**
  * Class to encapsulate a Property with various state variables. 
  * Belongs to a Household and can be traded between Households via the PropertyMarket in Auctions.
- * @author Friedrich Burkhard von der Osten, PhD Artificial Intelligence, The University of Melbourne
+ * @author Gideon Aschwanden && Friedrich Burkhard von der Osten
  */
 public class Property implements Comparable<Property>{
 

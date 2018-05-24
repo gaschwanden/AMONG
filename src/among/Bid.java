@@ -2,7 +2,7 @@ package among;
 
 /**
  * Class to encapsulate a Bid made on an Auction by an interested buyer.
- * @author Friedrich Burkhard von der Osten, PhD Artificial Intelligence, The University of Melbourne
+ * @author Gideon Aschwanden && Friedrich Burkhard von der Osten
  */
 public class Bid implements Comparable<Bid>{
 	

@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * Class to encapsulate an Auction. In an Auction a Property is offered for sale by a Household. 
  * It can attract a number of interested buyers that register their bids.
  * The ProprtyMarket will manage the Auction and execute it.
- * @author Friedrich Burkhard von der Osten, PhD Artificial Intelligence, The University of Melbourne
+ * @author Gideon Aschwanden && Friedrich Burkhard von der Osten
  */
 public class Auction implements Comparable<Auction>{
 	
