@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+import among.controller.ParameterWrapper;
 import repast.simphony.context.Context;
 import repast.simphony.engine.environment.RunEnvironment;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.parameter.Parameters;
 import repast.simphony.util.ContextUtils;
 import repast.simphony.util.collections.IndexedIterable;
+
 
 /**
  * Class to hold all objects in the simulation
@@ -85,7 +87,15 @@ public class Universe {
 	
 	@ScheduledMethod(start = 1, interval = 52, priority = 993)
 	public void dataCollection() throws Exception{
-		Parameters params = RunEnvironment.getInstance().getParameters();
+//		Parameters params = RunEnvironment.getInstance().getParameters();
+		
+		 ParameterWrapper obj = new ParameterWrapper();
+
+	     Object result=obj.readParams("/Users/waleems/git/AMONG/among.rs/parameters.xml");
+	     System.out.println("parameters are " + result);
+	     
+//		Parameters params = RunEnvironment.getInstance().getParameters();
+	     Parameters params = (Parameters) result ;
 		if(params.getBoolean("csv")){
 			data_collection_count++;
 			Context <Object > context = ContextUtils.getContext (this);
