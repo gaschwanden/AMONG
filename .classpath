@@ -7,5 +7,6 @@
 	<classpathentry kind="con" path="REPAST_SIMPHONY_SUPPORT"/>
 	<classpathentry kind="lib" path="lib/unirest-java-1.4.9-jar-with-dependencies.jar"/>
 	<classpathentry kind="lib" path="lib/jackson-jr-all-2.9.7.jar"/>
+	<classpathentry kind="lib" path="/Users/waleems/Projects/forked_repo/AMONG/lib/param.wrapper-1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

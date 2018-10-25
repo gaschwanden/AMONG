@@ -1,30 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <parameters>
-					<parameter name="shockSupply" displayName="Supply shock" type="int" 
+					<parameter name="CGTMagnitude" displayName="CGT shock magnitutde" type="double" 
+						defaultValue="5.0" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+									
+		/>
+				<parameter name="shockSupply" displayName="Supply shock" type="int" 
 						defaultValue="0" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
 		/>
-		<parameter name="policyShock" displayName="Policy shock" type="int" 
-						defaultValue="2500" 
-						isReadOnly="false" 
-						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
-									
-		/>
-		<parameter name="CGTMagnitude" displayName="CGT shock magnitutde" type="double" 
-						defaultValue="0.0" 
-						isReadOnly="false" 
-						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
-									
-		/>
-		<parameter name="NGMagnitude" displayName="NG shock magnitutde" type="double" 
-						defaultValue="0.0" 
-						isReadOnly="false" 
-						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
-									
-		/>
-		
 				<parameter name="demandMagnitude" displayName="Demand shock magnitude" type="double" 
 						defaultValue="0.2" 
 						isReadOnly="false" 
@@ -85,6 +72,12 @@
 						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
 									
 		/>
+				<parameter name="policyShock" displayName="Policy shock" type="int" 
+						defaultValue="2500" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+									
+		/>
 				<parameter name="shockIncome" displayName="Income shock" type="int" 
 						defaultValue="0" 
 						isReadOnly="false" 
@@ -95,6 +88,30 @@
 						defaultValue="1.0" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+									
+		/>
+				<parameter name="NGMagnitude" displayName="NG shock magnitude" type="double" 
+						defaultValue="0.10" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
+									
+		/>
+				<parameter name="webService_useWebParameters" displayName="WebService Use WebParameters" type="boolean" 
+						defaultValue="true" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$BooleanConverter"
+									
+		/>
+			   <parameter name="webService_url" displayName="WebServiceUrl" type="String" 
+						defaultValue="http://localhost:8080" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$StringStringConverter"
+									
+		/>
+			<parameter name="webService_pollingInterval" displayName="WebService Polling Interval" type="int" 
+						defaultValue="5000" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
 		/>
 		</parameters>
