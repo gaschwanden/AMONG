@@ -82,12 +82,17 @@ public class Universe {
 	}
 	
 	@ScheduledMethod(start = 1, interval = 1, priority = 990)
-	public void getChart()
+	public void populateChartDataAndSendToWebservice()
 	{
 		Context<Object> context = ContextUtils.getContext(this);
 		Universe universeObj= (Universe) context.getObjects(Universe.class).get(0);
 		Household householdObj= (Household) context.getObjects(Household.class).get(0);
 		PropertyMarket propertyMarketobj= (PropertyMarket) context.getObjects(PropertyMarket.class).get(0);
+		
+		if(RunEnvironment.getInstance().getCurrentSchedule().getTickCount()==1.0)
+		{ //This will update/initialise the map on the backend side
+			ChartsWrapper.getInstance().initialiseWebCharts();
+		}
 		
 		Map<String,String> chartsData = new HashMap<String,String>();
 		chartsData.put("tick",String.valueOf(RunEnvironment.getInstance().getCurrentSchedule().getTickCount()));
@@ -104,7 +109,6 @@ public class Universe {
 		chartsData.put("auctions_remaining",String.valueOf(propertyMarketobj.getAuctionsRemaining()));
 		chartsData.put("auctions_developer",String.valueOf(propertyMarketobj.getAuctionsDeveloper()));
 		
-//		System.out.println("ChartsData:"+ chartsData);
 		ChartsWrapper.getInstance().sendChartData(chartsData);
 	
 	}
@@ -113,8 +117,7 @@ public class Universe {
 	public void dataCollection() throws Exception {
 		
 		Parameters params = ParametersWrapper.getInstance().getParameters();
-	
-		System.out.println("paarams"+ params);
+
 
 		if (params.getBoolean("csv")) {
 			data_collection_count++;
