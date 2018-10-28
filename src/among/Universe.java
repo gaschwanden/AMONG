@@ -7,14 +7,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import repast.param.wrapper.ChartsWrapper;
+import repast.param.wrapper.ParametersWrapper;
 import repast.simphony.context.Context;
 import repast.simphony.engine.environment.RunEnvironment;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.parameter.Parameters;
 import repast.simphony.util.ContextUtils;
 import repast.simphony.util.collections.IndexedIterable;
-import repast.param.wrapper.ParametersWrapper;
-import repast.param.wrapper.ChartsWrapper;
+
 /**
  * Class to hold all objects in the simulation Provides auxiliary methods and
  * global events, as well as data collection
@@ -80,42 +81,45 @@ public class Universe {
 		 */
 		setPercentiles();
 	}
-	
+
 	@ScheduledMethod(start = 1, interval = 1, priority = 990)
-	public void populateChartDataAndSendToWebservice()
-	{
-		Context<Object> context = ContextUtils.getContext(this);
-		Universe universeObj= (Universe) context.getObjects(Universe.class).get(0);
-		Household householdObj= (Household) context.getObjects(Household.class).get(0);
-		PropertyMarket propertyMarketobj= (PropertyMarket) context.getObjects(PropertyMarket.class).get(0);
-		
-		if(RunEnvironment.getInstance().getCurrentSchedule().getTickCount()==1.0)
-		{ //This will update/initialise the map on the backend side
-			ChartsWrapper.getInstance().initialiseWebCharts();
+	public void populateChartDataAndSendToWebservice() {
+		final Context<Object> context = ContextUtils.getContext(this);
+		final ParametersWrapper parametersWrapper = ParametersWrapper.getInstance();
+		final ChartsWrapper chartsWrapper = ChartsWrapper.getInstance();
+
+		final double tickCount = RunEnvironment.getInstance().getCurrentSchedule().getTickCount();
+
+		if (tickCount <= 1D) {
+			parametersWrapper.initialise();
+			chartsWrapper.initialise();
 		}
-		
-		Map<String,String> chartsData = new HashMap<String,String>();
-		chartsData.put("tick",String.valueOf(RunEnvironment.getInstance().getCurrentSchedule().getTickCount()));
+
+		Universe universeObj = (Universe) context.getObjects(Universe.class).get(0);
+		Household householdObj = (Household) context.getObjects(Household.class).get(0);
+		PropertyMarket propertyMarketobj = (PropertyMarket) context.getObjects(PropertyMarket.class).get(0);
+
+		Map<String, String> chartsData = new HashMap<String, String>();
+		chartsData.put("tick", String.valueOf(tickCount));
 		chartsData.put("propertyValue", String.valueOf(universeObj.getAveragePropertyValue()));
-		chartsData.put("normalisedOs_renter",String.valueOf(householdObj.renterFraction()));
-		chartsData.put("normalisedOs_owner",String.valueOf(householdObj.ownerFraction()));
-		chartsData.put("normalisedOs_investor",String.valueOf(householdObj.investorFraction()));
-		chartsData.put("ownershipState_renter",String.valueOf(householdObj.renter()));
-		chartsData.put("ownershipState_owner",String.valueOf(householdObj.owner()));
-		chartsData.put("ownershipState_investor",String.valueOf(householdObj.investor()));
-		chartsData.put("aar",String.valueOf(propertyMarketobj.getAnticipatedAnnualReturn()));
-		chartsData.put("auctions_auctions",String.valueOf(propertyMarketobj.getAuctionsTotal()));
-		chartsData.put("auctions_completed",String.valueOf(propertyMarketobj.getAuctionsCompleted()));
-		chartsData.put("auctions_remaining",String.valueOf(propertyMarketobj.getAuctionsRemaining()));
-		chartsData.put("auctions_developer",String.valueOf(propertyMarketobj.getAuctionsDeveloper()));
-		
-		ChartsWrapper.getInstance().sendChartData(chartsData);
-	
+		chartsData.put("normalisedOs_renter", String.valueOf(householdObj.renterFraction()));
+		chartsData.put("normalisedOs_owner", String.valueOf(householdObj.ownerFraction()));
+		chartsData.put("normalisedOs_investor", String.valueOf(householdObj.investorFraction()));
+		chartsData.put("ownershipState_renter", String.valueOf(householdObj.renter()));
+		chartsData.put("ownershipState_owner", String.valueOf(householdObj.owner()));
+		chartsData.put("ownershipState_investor", String.valueOf(householdObj.investor()));
+		chartsData.put("aar", String.valueOf(propertyMarketobj.getAnticipatedAnnualReturn()));
+		chartsData.put("auctions_auctions", String.valueOf(propertyMarketobj.getAuctionsTotal()));
+		chartsData.put("auctions_completed", String.valueOf(propertyMarketobj.getAuctionsCompleted()));
+		chartsData.put("auctions_remaining", String.valueOf(propertyMarketobj.getAuctionsRemaining()));
+		chartsData.put("auctions_developer", String.valueOf(propertyMarketobj.getAuctionsDeveloper()));
+
+		chartsWrapper.publishSingleChartMap(chartsData);
 	}
 
 	@ScheduledMethod(start = 1, interval = 52, priority = 993)
 	public void dataCollection() throws Exception {
-		
+
 		Parameters params = ParametersWrapper.getInstance().getParameters();
 
 
@@ -123,7 +127,7 @@ public class Universe {
 			data_collection_count++;
 			Context<Object> context = ContextUtils.getContext(this);
 			IndexedIterable<Object> ii = context.getObjects(Household.class);
-			
+
 			String fnhh = "experiments/snapshot_household_" + data_collection_count + "_run_" + CONST.run + ".txt";
 			String fnpp = "experiments/snapshot_property_" + data_collection_count + "_run_" + CONST.run + ".txt";
 			String fngu = "experiments/snapshot_universe_" + data_collection_count + "_run_" + CONST.run + ".txt";
@@ -228,8 +232,6 @@ public class Universe {
 			income_shock = true;
 			VAR.wageGrowth = params.getDouble("incomeMagnitude");
 		}
-		
-		
 	}
 
 	// @ScheduledMethod(start = 1, interval = 1, priority = 2)
