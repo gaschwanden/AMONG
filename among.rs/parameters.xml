@@ -103,13 +103,13 @@
 									
 		/>
 			   <parameter name="webService_url" displayName="WebServiceUrl" type="String" 
-						defaultValue="http://localhost:8080" 
+						defaultValue="http://localhost:8080/api" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$StringStringConverter"
 									
 		/>
 			<parameter name="webService_pollingInterval" displayName="WebService Polling Interval" type="int" 
-						defaultValue="5000" 
+						defaultValue="1000" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
