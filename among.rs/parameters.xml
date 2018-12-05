@@ -12,6 +12,19 @@
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
 		/>
+		<parameter name="optimismShock" displayName="optimsim shock" type="int" 
+						defaultValue="2500" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
+									
+		/>
+		
+		<parameter name="optimsimValue" displayName="optimsim shock" type="double" 
+						defaultValue="0.5" 
+						isReadOnly="false" 
+						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"									
+		/>
+		
 		<parameter name="CGTMagnitude" displayName="CGT shock magnitutde" type="double" 
 						defaultValue="0.0" 
 						isReadOnly="false" 
@@ -24,7 +37,7 @@
 						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
 									
 		/>
-		
+		 
 				<parameter name="demandMagnitude" displayName="Demand shock magnitude" type="double" 
 						defaultValue="0.2" 
 						isReadOnly="false" 

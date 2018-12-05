@@ -247,7 +247,7 @@ public class Household implements Comparable<Household>{
 				double projected = p.getValueProjected();
 
 				double margin = (projected - current) * scale;
-				double timeOnMarketMultiplicator = Math.pow(1-CONST.reducedReserve/100,p.timeOnMarket/CONST.year_ticks);
+				double timeOnMarketMultiplicator = Math.pow(1-(CONST.reducedReserveOvertime/100),p.timeOnMarket/CONST.year_ticks);
 				double reserve_price = current + margin;// add history of how long it is on the market
 				reserve_price = reserve_price*timeOnMarketMultiplicator;
 //				if(p.timeOnMarket!=0)System.out.println("timeOnMarketDepriciation = "+timeOnMarketMultiplicator);
@@ -308,6 +308,7 @@ public class Household implements Comparable<Household>{
 		if(buy){
 			ArrayList<Auction> auctions = global.property_market.getAuctions();
 			for(Auction a : auctions){
+//				if(a.property == null)continue;
 				if(a.getReservePrice() <= buy_affordable_price){
 					double actual_bid = calculateBid(a.property);
 					if(actual_bid <= buy_affordable_price){
@@ -332,11 +333,11 @@ public class Household implements Comparable<Household>{
 		
 		double actual_bid = 0;
 		
-		if(Math.random()<0.8){
+//		if(Math.random()<0.8){
 			actual_bid = calculateBidByTime(p);
-		}else {
-			actual_bid = calculateBidByNeighbors(p);
-		}
+//		}else {
+//			actual_bid = calculateBidByNeighbors(p);
+//		}
 
 		return actual_bid;
 	}
@@ -347,19 +348,23 @@ public class Household implements Comparable<Household>{
 		double rate = 0;
 		int iteratorCounter =0;
 		for (int i = p.ID - 10;i<p.ID+10;i++){
-			if(i==0)continue;
+			double localRate = -999;
+			if(i==p.ID)continue;
 			
 			// Properties are arranged in a circular manner where the last is adjecant to the first in the list
 			if (i<0) i = global.properties.size()-i;
-			if (i>=global.properties.size()) i = i-global.properties.size();
+			if (i>=global.properties.size()){
+				localRate = global.properties.get(i-global.properties.size()).annualAppreciation;
+			}else{
+				localRate = global.properties.get(i).annualAppreciation;
+			}
 			
-			double localRate = global.properties.get(i).annualAppreciation;
 			if(localRate !=-999){
 				rate += localRate;
 				iteratorCounter++;
 			}
 		}
-		if(iteratorCounter!=0){
+		if(iteratorCounter>1){
 			rate =rate/iteratorCounter; 
 		}else{
 			rate = CONST.rentReturn;

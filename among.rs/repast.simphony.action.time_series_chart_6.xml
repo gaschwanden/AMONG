@@ -1,9 +1,9 @@
 <repast.simphony.chart2.engine.TimeSeriesChartDescriptor>
-  <name>Property Value</name>
-  <dataSet>Property Value</dataSet>
-  <xAxisLabel>Tick Count</xAxisLabel>
+  <name>Property ValueV</name>
+  <dataSet>Property ValueV</dataSet>
+  <xAxisLabel>Tick CountV</xAxisLabel>
   <yAxisLabel></yAxisLabel>
-  <chartTitle>Property Value</chartTitle>
+  <chartTitle>Property ValueV</chartTitle>
   <type>TIME_SERIES</type>
   <background>
     <red>192</red>
@@ -21,13 +21,37 @@
   <showLegend>true</showLegend>
   <seriesIds>
     <entry>
-      <string>Property Value</string>
+      <string>Property Market Value</string>
       <SeriesData>
-        <label>Property Value</label>
+        <label>Property Market Value</label>
         <color>
           <red>0</red>
           <green>0</green>
           <blue>255</blue>
+          <alpha>255</alpha>
+        </color>
+      </SeriesData>
+    </entry>
+    <entry>
+      <string>Property Sold Value</string>
+      <SeriesData>
+        <label>Property Sold Value</label>
+        <color>
+          <red>255</red>
+          <green>0</green>
+          <blue>255</blue>
+          <alpha>255</alpha>
+        </color>
+      </SeriesData>
+    </entry>
+    <entry>
+      <string>Property Book Value</string>
+      <SeriesData>
+        <label>Property Book Value</label>
+        <color>
+          <red>0</red>
+          <green>50</green>
+          <blue>55</blue>
           <alpha>255</alpha>
         </color>
       </SeriesData>

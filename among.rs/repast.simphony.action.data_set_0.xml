@@ -16,7 +16,7 @@
   <atEnd>false</atEnd>
   <methodDataSources class="linked-hash-map">
     <entry>
-      <string>Property Value</string>
+      <string>Property ValueVV</string>
       <repast.simphony.data2.engine.MethodDataSourceDefinition>
         <id>Property Value</id>
         <className>among.Universe</className>

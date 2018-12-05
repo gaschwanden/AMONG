@@ -82,7 +82,7 @@ public class PropertyMarket {
 		transaction_values.add(tv);
 		sold_properties.add(ps);
 		clearAuctions();
-		avg_property_values.add(global.getAveragePropertyValue());
+		avg_property_values.add(global.soldValue());
 	}
 	
 	/**
@@ -184,7 +184,7 @@ public class PropertyMarket {
 	}
 	
 	public void initialize(){
-		avg_property_values.add(global.getAveragePropertyValue());
+		avg_property_values.add(global.soldValue());
 	}
 
 	/**
