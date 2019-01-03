@@ -1,5 +1,5 @@
 <repast.simphony.data2.engine.DataSetDescriptor>
-  <name>Property Value</name>
+  <name>Property ValueV</name>
   <type>AGGREGATE</type>
   <inclTick>true</inclTick>
   <inclBatchRun>false</inclBatchRun>
@@ -16,9 +16,27 @@
   <atEnd>false</atEnd>
   <methodDataSources class="linked-hash-map">
     <entry>
-      <string>Property Value</string>
+      <string>Property Market Value</string>
       <repast.simphony.data2.engine.MethodDataSourceDefinition>
-        <id>Property Value</id>
+        <id>Property Market Value</id>
+        <className>among.Universe</className>
+        <methodName>marketValue</methodName>
+        <aggType>SUM</aggType>
+      </repast.simphony.data2.engine.MethodDataSourceDefinition>
+    </entry>
+    <entry>
+      <string>Property Sold Value</string>
+      <repast.simphony.data2.engine.MethodDataSourceDefinition>
+        <id>Property Sold Value</id>
+        <className>among.Universe</className>
+        <methodName>soldValue</methodName>
+        <aggType>SUM</aggType>
+      </repast.simphony.data2.engine.MethodDataSourceDefinition>
+    </entry>
+    <entry>
+      <string>Property Book Value</string>
+      <repast.simphony.data2.engine.MethodDataSourceDefinition>
+        <id>Property Book Value</id>
         <className>among.Universe</className>
         <methodName>getAveragePropertyValue</methodName>
         <aggType>SUM</aggType>

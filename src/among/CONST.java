@@ -8,7 +8,7 @@ public class CONST {
 	public static double optimism = 0.50; //outlook of households:  0.0 pessimism / 1.0 optimism
 	
 	public static double year_ticks = 52; // Weeks per year
-	public static double tick_limit = 1000; // 2000 or 5200
+	public static double tick_limit = 5000; // 2000 or 5200
 	public static boolean delayedResponse = false;
 	
 	// property
@@ -27,7 +27,9 @@ public class CONST {
 	public static double downpayment = 0.2; // % of property value used as downpayment
 	public static double bidIncrease = 0.2; // % to go over reserve price when bidding
 	public static double bidVariation = 0.05; // % variation in bidding price
-	public static double reducedReserve = 0.2; // % slash on reserve price when selling under pressure (assets < 0)
+	public static double reducedReserve = 0.1; // % slash on reserve price when selling under pressure (assets < 0)
+	public static double reducedReserveOvertime = 20; // % slash on reserve price over time annually (assets < 0)
+
 	public static double minDeposit = 50000.0; // minimum assets to buy property
 	
 	// taxes

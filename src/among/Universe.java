@@ -180,8 +180,30 @@ public class Universe {
 			System.out.println("Negative Gearing new = " + VAR.negativeGearing);
 			System.out.println("CGT Discount new = " + VAR.CGTDiscount);
 		}
+<<<<<<< HEAD
 
 		if (tick == (double) params.getInteger("shockSupply")) {
+=======
+		
+		if(tick == (double)params.getInteger("optimismShock")){
+			
+			System.out.println("Optimism Shock!");
+			
+			System.out.println();
+			System.out.println("Optimism old = "+CONST.optimism);
+			
+			CONST.optimism = params.getDouble("optimsimValue");
+			System.out.println("Optimism new = "+CONST.optimism);
+
+			
+			previous_CGT = VAR.CGTDiscount;
+			previous_NG = VAR.negativeGearing;
+			
+		}
+		
+		
+		if(tick == (double)params.getInteger("shockSupply")){
+>>>>>>> master
 			previous_supply = VAR.propertyGrowth;
 			supply_shock = true;
 			VAR.propertyGrowth = params.getDouble("supplyMagnitude");
@@ -196,10 +218,27 @@ public class Universe {
 			income_shock = true;
 			VAR.wageGrowth = params.getDouble("incomeMagnitude");
 		}
+		
+		if(tick>1){
+			updatePropertyMarketValue();
+		}
 	}
+<<<<<<< HEAD
 
 	// @ScheduledMethod(start = 1, interval = 1, priority = 2)
 	public void printBalance() {
+=======
+	
+	private void updatePropertyMarketValue() {
+		double aar = property_market.getAnticipatedAnnualReturn();
+//		System.out.println("aar = "+aar);
+		for(Property p:properties)
+			p.updateMarketValueProperty(aar);	
+	}
+
+	//@ScheduledMethod(start = 1, interval = 1, priority = 2)
+	public void printBalance(){
+>>>>>>> master
 		System.out.println("----BALANCE");
 		double asum = getAssetSum();
 
@@ -325,12 +364,25 @@ public class Universe {
 		}
 		return asum;
 	}
+<<<<<<< HEAD
 
 	public double getAveragePropertyValue() {
 		double vsum = 0;
 		for (Property p : properties) {
+=======
+	
+	public double soldValue(){
+		double vsum = 0;
+		int timer = 0;
+		for(Property p : properties){
+			if(p.time_since_transaction<2){
+>>>>>>> master
 			vsum += p.getTransationValue();
+//			System.out.println(p.getTransationValue());
+			timer++;
+			}
 		}
+<<<<<<< HEAD
 		// System.out.println(properties.size());
 		// System.out.println("vsum = "+vsum);
 		return (vsum / properties.size());
@@ -338,6 +390,41 @@ public class Universe {
 
 	public void setPercentiles() {
 		// System.out.println("----PERCENTILES");
+=======
+//		System.out.println(properties.size());
+//		System.out.println("vsum = "+vsum);
+//		System.out.println("soldValue = "+vsum/timer+" : "+vsum+"/"+timer);
+		return (vsum/timer);
+	}
+	
+	public double marketValue(){
+		double vsum = 0;
+		for(Property p : properties){
+			vsum += p.getMarketValue();
+		}
+//		System.out.println(properties.size());
+//		System.out.println("vsum = "+vsum);
+//		System.out.println("getAveragePropertyMarketValue = "+vsum/properties.size());
+
+		return (vsum/properties.size());
+	}
+
+	public double getAveragePropertyValue(){
+		double vsum = 0;
+		int timer = 0;
+		for(Property p : properties){
+			if(p.getTimeSinceTransaction()>1){
+				vsum += p.getTransationValue();
+				timer++;
+			}
+		}
+//		System.out.println("getAveragePropertyBookValue = "+vsum/timer);
+		return (vsum/timer);
+	}
+
+	public void setPercentiles(){
+		//System.out.println("----PERCENTILES");
+>>>>>>> master
 		Collections.sort(households);
 		for (int i = 1; i < 10; i++) {
 			// System.out.println("Attempting index "+(i*CONST.household_ID)/10);

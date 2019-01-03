@@ -22,6 +22,7 @@ public class Property implements Comparable<Property>{
 	private double value_projected;
 	private double value;
 	private double value_transaction;
+	private double value_market;
 	private double value_previous_transaction;
 	public Integer timeOnMarket = 0;
 
@@ -45,6 +46,7 @@ public class Property implements Comparable<Property>{
 		value_previous = value;
 		value_projected = value;
 		value_transaction = value;
+		value_market = value;
 		value_previous_transaction = value;
 		
 		cost = value * CONST.maintenance;
@@ -62,6 +64,7 @@ public class Property implements Comparable<Property>{
 		value_previous = value;
 		value_projected = value;
 		value_transaction = value;
+		value_market = value;
 		value_previous_transaction = value;
 
 		cost = value * CONST.maintenance;
@@ -161,9 +164,17 @@ public class Property implements Comparable<Property>{
 	public Mortgage getMortgage(){
 		return mortgage;
 	}
+	
+	public double getMarketValue() {
+		return value_market;
+	}
 
 	@Override
 	public int compareTo(Property p) {
 		return Double.compare(p.getValue(), this.getValue()); // highest to lowest
+	}
+
+	public void updateMarketValueProperty(double aar) {
+		value_market = value_market*(1+aar/CONST.year_ticks);
 	}
 }
