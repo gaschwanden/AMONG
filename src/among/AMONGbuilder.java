@@ -23,7 +23,7 @@ public class AMONGbuilder implements ContextBuilder<Object> {
 		RunEnvironment.getInstance().endAt(CONST.tick_limit);
 
 		Parameters params = ParametersWrapper.getInstance().getParameters();
-		VAR.random_seed = (long) params.getInteger("randomSeed");
+		VAR.random_seed = params.getInteger("randomSeed");
 		// VAR.initial_households = params.getInteger("households");
 
 		VAR.CGTDiscount = params.getDouble("cgt");
