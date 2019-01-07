@@ -6,9 +6,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 
-import repast.param.wrapper.ChartsWrapper;
-import repast.param.wrapper.ParametersWrapper;
+import au.edu.unimelb.eresearch.repast.parameterswrapper.ChartsWrapper;
+import au.edu.unimelb.eresearch.repast.parameterswrapper.ParametersWrapper;
 import repast.simphony.context.Context;
 import repast.simphony.engine.environment.RunEnvironment;
 import repast.simphony.engine.schedule.ScheduledMethod;
@@ -305,24 +306,48 @@ public class Universe {
 			chartsWrapper.initialise();
 		}
 
-		Universe universeObj = (Universe) context.getObjects(Universe.class).get(0);
-		Household householdObj = (Household) context.getObjects(Household.class).get(0);
-		PropertyMarket propertyMarketobj = (PropertyMarket) context.getObjects(PropertyMarket.class).get(0);
+		final Map<String, Double> data = new HashMap<String, Double>();
 
-		Map<String, String> chartsData = new HashMap<String, String>();
-		chartsData.put("tick", String.valueOf(tickCount));
-		chartsData.put("propertyValue", String.valueOf(universeObj.getAveragePropertyValue()));
-		chartsData.put("normalisedOs_renter", String.valueOf(householdObj.renterFraction()));
-		chartsData.put("normalisedOs_owner", String.valueOf(householdObj.ownerFraction()));
-		chartsData.put("normalisedOs_investor", String.valueOf(householdObj.investorFraction()));
-		chartsData.put("ownershipState_renter", String.valueOf(householdObj.renter()));
-		chartsData.put("ownershipState_owner", String.valueOf(householdObj.owner()));
-		chartsData.put("ownershipState_investor", String.valueOf(householdObj.investor()));
-		chartsData.put("aar", String.valueOf(propertyMarketobj.getAnticipatedAnnualReturn()));
-		chartsData.put("auctions_auctions", String.valueOf(propertyMarketobj.getAuctionsTotal()));
-		chartsData.put("auctions_completed", String.valueOf(propertyMarketobj.getAuctionsCompleted()));
-		chartsData.put("auctions_remaining", String.valueOf(propertyMarketobj.getAuctionsRemaining()));
-		chartsData.put("auctions_developer", String.valueOf(propertyMarketobj.getAuctionsDeveloper()));
+		// Global Variables
+		data.put("tick", tickCount);
+
+		// Universe Variables
+		context.getObjects(Universe.class).forEach(o -> {
+			final Universe u = (Universe) o;
+
+			data.merge("propertyValue_averagePropertyValue", u.getAveragePropertyValue(), Double::sum);
+			data.merge("propertyValue_marketValue", u.marketValue(), Double::sum);
+			data.merge("propertyValue_soldValue", u.soldValue(), Double::sum);
+		});
+
+		// Household Variables
+		context.getObjects(Household.class).forEach(o -> {
+			final Household h = (Household) o;
+
+			data.merge("normalisedOs_renter", h.renterFraction(), Double::sum);
+			data.merge("normalisedOs_owner", h.ownerFraction(), Double::sum);
+			data.merge("normalisedOs_investor", h.investorFraction(), Double::sum);
+
+			data.merge("ownershipState_renter", (double) h.renter(), Double::sum);
+			data.merge("ownershipState_owner", (double) h.owner(), Double::sum);
+			data.merge("ownershipState_investor", (double) h.investor(), Double::sum);
+		});
+
+		// PropertyMarket Variables
+		context.getObjects(PropertyMarket.class).forEach(o -> {
+			final PropertyMarket p = (PropertyMarket) o;
+
+			data.merge("aar", p.getAnticipatedAnnualReturn(), Double::sum);
+
+			data.merge("auctions_auctions", (double) p.getAuctionsTotal(), Double::sum);
+			data.merge("auctions_completed", (double) p.getAuctionsCompleted(), Double::sum);
+			data.merge("auctions_remaining", (double) p.getAuctionsRemaining(), Double::sum);
+			data.merge("auctions_developer", (double) p.getAuctionsDeveloper(), Double::sum);
+		});
+
+		// Convert to required Entry<String, String> format
+		final Map<String, String> chartsData = data.entrySet().stream()
+				.collect(Collectors.toMap(Map.Entry::getKey, e -> String.valueOf(e.getValue())));
 
 		chartsWrapper.publishSingleChartMap(chartsData);
 	}
