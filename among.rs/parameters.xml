@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <parameters>
-<<<<<<< HEAD
-					<parameter name="CGTMagnitude" displayName="CGT shock magnitutde" type="double" 
-						defaultValue="5.0" 
-=======
 					<parameter name="shockSupply" displayName="Supply shock" type="int" 
 						defaultValue="0" 
 						isReadOnly="false" 
@@ -31,7 +27,6 @@
 		
 		<parameter name="CGTMagnitude" displayName="CGT shock magnitutde" type="double" 
 						defaultValue="0.0" 
->>>>>>> master
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$DoubleConverter"
 									
@@ -42,10 +37,7 @@
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									
 		/>
-<<<<<<< HEAD
-=======
 		 
->>>>>>> master
 				<parameter name="demandMagnitude" displayName="Demand shock magnitude" type="double" 
 						defaultValue="0.2" 
 						isReadOnly="false" 
