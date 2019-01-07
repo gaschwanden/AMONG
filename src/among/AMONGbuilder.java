@@ -1,6 +1,6 @@
 package among;
 
-import repast.param.wrapper.ParametersWrapper;
+import au.edu.unimelb.eresearch.repast.parameterswrapper.ParametersWrapper;
 import repast.simphony.context.Context;
 import repast.simphony.dataLoader.ContextBuilder;
 import repast.simphony.engine.environment.RunEnvironment;

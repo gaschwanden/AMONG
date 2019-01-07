@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import repast.param.wrapper.ChartsWrapper;
-import repast.param.wrapper.ParametersWrapper;
+import au.edu.unimelb.eresearch.repast.parameterswrapper.ChartsWrapper;
+import au.edu.unimelb.eresearch.repast.parameterswrapper.ParametersWrapper;
 import repast.simphony.context.Context;
 import repast.simphony.engine.environment.RunEnvironment;
 import repast.simphony.engine.schedule.ScheduledMethod;
