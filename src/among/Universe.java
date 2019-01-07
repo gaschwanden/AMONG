@@ -315,7 +315,9 @@ public class Universe {
 		context.getObjects(Universe.class).forEach(o -> {
 			final Universe u = (Universe) o;
 
-			data.merge("propertyValue", u.getAveragePropertyValue(), Double::sum);
+			data.merge("propertyValue_averagePropertyValue", u.getAveragePropertyValue(), Double::sum);
+			data.merge("propertyValue_marketValue", u.marketValue(), Double::sum);
+			data.merge("propertyValue_soldValue", u.soldValue(), Double::sum);
 		});
 
 		// Household Variables
