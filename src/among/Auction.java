@@ -21,7 +21,7 @@ public class Auction implements Comparable<Auction> {
 	public Auction(Household s, Property p, double price, Integer q) {
 		seller = s;
 		property = p;
-		qualityBraket = q;
+		setPropertyQualityBraket(q);
 		reserve_price = price;
 		bids = new ArrayList<Bid>();
 	}
@@ -103,5 +103,13 @@ public class Auction implements Comparable<Auction> {
 	@Override
 	public int compareTo(Auction a) {
 		return Double.compare(a.getHighestBid(), this.getHighestBid()); // highest to lowest
+	}
+
+	public Integer getPropertyQualityBraket() {
+		return qualityBraket;
+	}
+
+	public void setPropertyQualityBraket(Integer qualityBraket) {
+		this.qualityBraket = qualityBraket;
 	}
 }

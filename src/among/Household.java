@@ -288,33 +288,33 @@ public class Household implements Comparable<Household> {
 	}
 
 
-	private double calculateReservePriceLocation(Property p) {
-		double localAAR = 0;
-		for(int i = p.ID-(int)investment_horizon;i<p.ID+investment_horizon;i++){
-			
-			// Control for property array range
-			if(i<0){i=global.properties.size()-i;}
-			if(i>=global.properties.size()){i=i-global.properties.size();}
-
-			Property property = global.properties.get(i);
-			if(property.getAAR()>0){
-				System.out.println("Try");
-			};
-			localAAR += property.getAAR();
-			
-		}
-		localAAR = localAAR/(2*(int)investment_horizon);
-		
-		double reserve = p.value_previous* Math.pow(1+localAAR, p.time_since_transaction);
-		
-		if(global.rnd.nextBoolean()){
-			reserve *= (1-CONST.bidVariation);
-		}else{
-			reserve *= (1+CONST.bidVariation);
-		}
-		
-		return reserve;
-	}
+//	private double calculateReservePriceLocation(Property p) {
+//		double localAAR = 0;
+//		for(int i = p.ID-(int)investment_horizon;i<p.ID+investment_horizon;i++){
+//			
+//			// Control for property array range
+//			if(i<0){i=global.properties.size()-i;}
+//			if(i>=global.properties.size()){i=i-global.properties.size();}
+//
+//			Property property = global.properties.get(i);
+//			if(property.getAAR()>0){
+//				System.out.println("Try");
+//			};
+//			localAAR += property.getAAR();
+//			
+//		}
+//		localAAR = localAAR/(2*(int)investment_horizon);
+//		
+//		double reserve = p.value_previous* Math.pow(1+localAAR, p.time_since_transaction);
+//		
+//		if(global.rnd.nextBoolean()){
+//			reserve *= (1-CONST.bidVariation);
+//		}else{
+//			reserve *= (1+CONST.bidVariation);
+//		}
+//		
+//		return reserve;
+//	}
 
 	@ScheduledMethod(start = 1, interval = 1, priority = 996)
 	public void executeDecision() {
@@ -362,39 +362,39 @@ public class Household implements Comparable<Household> {
 		return NPVtotalDeductions;
 	}
 
-	private double calculateBidByNeighbors(Property p) {
-
-		double actual_bid = 0;
-		double rate = 0;
-		int iteratorCounter = 0;
-		for (int i = p.ID - 10; i < p.ID + 10; i++) {
-			double localRate = -999;
-			if (i == p.ID)
-				continue;
-
-			// Properties are arranged in a circular manner where the last is adjecant to
-			// the first in the list
-			if (i < 0)
-				i = global.properties.size() - i;
-			if (i >= global.properties.size()) {
-				localRate = global.properties.get(i - global.properties.size()).getAAR();
-			} else {
-				localRate = global.properties.get(i).getAAR();
-			}
-
-			if (localRate != -999) {
-				rate += localRate;
-				iteratorCounter++;
-			}
-		}
-		if (iteratorCounter > 1) {
-			rate = rate / iteratorCounter;
-		} else {
-			rate = CONST.rentReturn;
-		}
-		actual_bid = p.getValuePrevious() * Math.pow(1 + rate, p.time_since_transaction / CONST.year_ticks);
-		return actual_bid;
-	}
+//	private double calculateBidByNeighbors(Property p) {
+//
+//		double actual_bid = 0;
+//		double rate = 0;
+//		int iteratorCounter = 0;
+//		for (int i = p.ID - 10; i < p.ID + 10; i++) {
+//			double localRate = -999;
+//			if (i == p.ID)
+//				continue;
+//
+//			// Properties are arranged in a circular manner where the last is adjecant to
+//			// the first in the list
+//			if (i < 0)
+//				i = global.properties.size() - i;
+//			if (i >= global.properties.size()) {
+//				localRate = global.properties.get(i - global.properties.size()).getAAR();
+//			} else {
+//				localRate = global.properties.get(i).getAAR();
+//			}
+//
+//			if (localRate != -999) {
+//				rate += localRate;
+//				iteratorCounter++;
+//			}
+//		}
+//		if (iteratorCounter > 1) {
+//			rate = rate / iteratorCounter;
+//		} else {
+//			rate = CONST.rentReturn;
+//		}
+//		actual_bid = p.getValuePrevious() * Math.pow(1 + rate, p.time_since_transaction / CONST.year_ticks);
+//		return actual_bid;
+//	}
 
 	private double calculateBidByTime(Property p) {
 		boolean optimist = global.rnd.nextBoolean();

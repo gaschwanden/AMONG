@@ -14,7 +14,7 @@ public class Bank {
 		global = u;
 		interest_paid = 0;
 		principal_paid = 0;
-		credit_paid = 0;
+		setTotalCredit_paid(0);
 	}
 
 	public double estimateMonthlyPayments(double remainingAmount, double remainingMonths) {
@@ -64,7 +64,7 @@ public class Bank {
 	}
 
 	public void payCreditInterest(double a) {
-		credit_paid += a;
+		setTotalCredit_paid(getTotalCredit_paid() + a);
 	}
 
 	public void payInterest(double a) {
@@ -81,5 +81,13 @@ public class Bank {
 
 	public double getPrincipalPaid() {
 		return principal_paid;
+	}
+
+	public double getTotalCredit_paid() {
+		return credit_paid;
+	}
+
+	public void setTotalCredit_paid(double credit_paid) {
+		this.credit_paid = credit_paid;
 	}
 }

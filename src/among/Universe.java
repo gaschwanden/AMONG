@@ -1,7 +1,6 @@
 package among;
 
 import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,7 +20,6 @@ import repast.simphony.engine.environment.RunEnvironment;
 import repast.simphony.engine.schedule.ScheduledMethod;
 import repast.simphony.parameter.Parameters;
 import repast.simphony.util.ContextUtils;
-import repast.simphony.util.collections.IndexedIterable;
 
 /**
  * Class to hold all objects in the simulation Provides auxiliary methods and
@@ -44,7 +42,6 @@ public class Universe {
 	public PropertyMarket property_market;
 
 	private double balance;
-	private int data_collection_count;
 
 	private boolean supply_shock;
 	private boolean demand_shock;
@@ -60,7 +57,7 @@ public class Universe {
 	private boolean  writeHousholdInformation;
 	private boolean writeGlobalInformation;
 
-	private Writer fnpp;
+//	private Writer fnpp;
 	private File file;
 	private File file2;
 	private File file3;
@@ -76,7 +73,6 @@ public class Universe {
 		households = new ArrayList<Household>();
 		properties = new ArrayList<Property>();
 
-		data_collection_count = 0;
 		supply_shock = false;
 		demand_shock = false;
 		income_shock = false;
@@ -108,12 +104,11 @@ public class Universe {
 	public void dataCollectionAlways() throws Exception {
 
 		if(writePropertyPrices){
-			data_collection_count++;
-			//Context<Object> context = ContextUtils.getContext(this);
-			//IndexedIterable<Object> ii = context.getObjects(Household.class);
+
 		    if(file == null){
 		    	file = new File ("snapshot_property.txt");
 		    }
+		    
 			if(writerProperty == null){
 				writerProperty = new PrintWriter("snapshot_property.txt");
 				writerProperty.println("tick,ID,value_initial,value,value_previous,value_projected,time_since_transaction,transactions,timeOnMarket");
@@ -178,64 +173,64 @@ public class Universe {
 		}
 	}
 
-	@ScheduledMethod(start = 1, interval = 52, priority = 993)
-	public void dataCollection() throws Exception {
-
-		Parameters params = ParametersWrapper.getInstance().getParameters();
-		
-		if (params.getBoolean("csv")) {
-			data_collection_count++;
-			Context<Object> context = ContextUtils.getContext(this);
-			IndexedIterable<Object> ii = context.getObjects(Household.class);
-
-			String fnhh = "experiments/snapshot_household_" + data_collection_count + "_run_" + CONST.run + ".txt";
-			String fnpp = "experiments/snapshot_property_" + data_collection_count + "_run_" + CONST.run + ".txt";
-			String fngu = "experiments/snapshot_universe_" + data_collection_count + "_run_" + CONST.run + ".txt";
-			PrintWriter writerhh = new PrintWriter(fnhh);
-			PrintWriter writerpp = new PrintWriter(fnpp);
-			PrintWriter writergu = new PrintWriter(fngu);
-			if (!params.getBoolean("aggregate")) {
-				for (Object o : ii) {
-					Household h = (Household) o;
-					writerhh.print(h.householdToFileFormat());
-					writerpp.print(h.propertyToFileFormat());
-				}
-			} else {
-				int R = 0;
-				int O = 0;
-				int I = 0;
-				int FHO = 0;
-				for (Object o : ii) {
-					Household h = (Household) o;
-					R += h.renter();
-					O += h.owner();
-					I += h.investor();
-					if (h.isFHO() && h.renter() == 0) {
-						FHO++;
-					}
-				}
-				writerhh.println("Renter: " + R);
-				writerhh.println("Owner: " + O);
-				writerhh.println("Inestor: " + I);
-				writerhh.println("FHOS: " + FHO);
-
-				IndexedIterable<Object> ip = context.getObjects(Property.class);
-				double cumulative_property_value = 0;
-				for (Object o : ip) {
-					Property p = (Property) o;
-					cumulative_property_value += p.getValue();
-				}
-				writerpp.println(cumulative_property_value);
-			}
-			for (int i = 0; i < CONST.income_deciles.length; i++) {
-				writergu.print(CONST.income_deciles[i] + ": ");
-				writergu.print(CONST.CGTLost[i] + "," + CONST.NGLost[i] + "\n");
-			}
-			writerhh.close();
-			writerpp.close();
-			writergu.close();
-		}
-	}
+//	@ScheduledMethod(start = 1, interval = 52, priority = 993)
+//	public void dataCollection() throws Exception {
+//
+//		Parameters params = ParametersWrapper.getInstance().getParameters();
+//		
+//		if (params.getBoolean("csv")) {
+//			data_collection_count++;
+//			Context<Object> context = ContextUtils.getContext(this);
+//			IndexedIterable<Object> ii = context.getObjects(Household.class);
+//
+//			String fnhh = "experiments/snapshot_household_" + data_collection_count + "_run_" + CONST.run + ".txt";
+//			String fnpp = "experiments/snapshot_property_" + data_collection_count + "_run_" + CONST.run + ".txt";
+//			String fngu = "experiments/snapshot_universe_" + data_collection_count + "_run_" + CONST.run + ".txt";
+//			PrintWriter writerhh = new PrintWriter(fnhh);
+//			PrintWriter writerpp = new PrintWriter(fnpp);
+//			PrintWriter writergu = new PrintWriter(fngu);
+//			if (!params.getBoolean("aggregate")) {
+//				for (Object o : ii) {
+//					Household h = (Household) o;
+//					writerhh.print(h.householdToFileFormat());
+//					writerpp.print(h.propertyToFileFormat());
+//				}
+//			} else {
+//				int R = 0;
+//				int O = 0;
+//				int I = 0;
+//				int FHO = 0;
+//				for (Object o : ii) {
+//					Household h = (Household) o;
+//					R += h.renter();
+//					O += h.owner();
+//					I += h.investor();
+//					if (h.isFHO() && h.renter() == 0) {
+//						FHO++;
+//					}
+//				}
+//				writerhh.println("Renter: " + R);
+//				writerhh.println("Owner: " + O);
+//				writerhh.println("Inestor: " + I);
+//				writerhh.println("FHOS: " + FHO);
+//
+//				IndexedIterable<Object> ip = context.getObjects(Property.class);
+//				double cumulative_property_value = 0;
+//				for (Object o : ip) {
+//					Property p = (Property) o;
+//					cumulative_property_value += p.getValue();
+//				}
+//				writerpp.println(cumulative_property_value);
+//			}
+//			for (int i = 0; i < CONST.income_deciles.length; i++) {
+//				writergu.print(CONST.income_deciles[i] + ": ");
+//				writergu.print(CONST.CGTLost[i] + "," + CONST.NGLost[i] + "\n");
+//			}
+//			writerhh.close();
+//			writerpp.close();
+//			writergu.close();
+//		}
+//	}
 
 	@ScheduledMethod(start = 1, interval = 1, priority = 992)
 	public void eventChecker() {

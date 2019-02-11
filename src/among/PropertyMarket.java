@@ -384,29 +384,25 @@ public class PropertyMarket {
 	
 	public double getAverageMarketProspect(int timeperiod) {
 
-		double magnitude = global.rnd.nextDouble();
-		boolean sign = global.rnd.nextBoolean();
-		double average=0.0;
-//		int ticker = 0;
-		if (sign) {
-			magnitude *= -1;
-		}
-		magnitude *= CONST.marketVariance;
+//		double magnitude = global.rnd.nextDouble();
+//		boolean sign = global.rnd.nextBoolean();
+//		
+//		if (sign) {
+//			magnitude *= -1;
+//		}
+//		magnitude *= CONST.marketVariance;
 		
-
-//		System.out.println("averageAAR.size = "+averageAAR.size()+"; and timeperiod = "+timeperiod);
+		double average=0.0;
 		for(int i = 0; i<timeperiod;i++){
 			int index = averageAAR.size()-timeperiod+i;
 			if(index<0){
 				average = average + 0.07;
-//				System.out.println("average before"+average);
 			}else{
 				average = average + averageAAR.get(index);//+magnitude;
 			}
 		}
 		
 		average = average/timeperiod;
-//		System.out.println((int)global.tick+"; averageAAR.size = "+averageAAR.size()+"; timeperiod = "+timeperiod +"; average = "+average);
 
 		return average;
 	}

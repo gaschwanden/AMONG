@@ -16,7 +16,7 @@ import repast.simphony.parameter.Parameters;
 public class AMONGbuilder implements ContextBuilder<Object> {
 
 	@Override
-	public Context build(Context<Object> context) {
+	public Context<Object> build(Context<Object> context) {
 		CONST.household_ID = 0;
 		CONST.property_ID = 0;
 		context.setId("among");
