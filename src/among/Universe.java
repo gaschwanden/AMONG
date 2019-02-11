@@ -60,7 +60,6 @@ public class Universe {
 	private boolean  writeHousholdInformation;
 	private boolean writeGlobalInformation;
 
-	//public String fnpp;
 	private Writer fnpp;
 	private File file;
 	private File file2;
@@ -258,10 +257,9 @@ public class Universe {
 			income_shock = false;
 		}
 
-		// if(policy_shock){
-		// VAR.CGTDiscount = previous_CGT;
-		//
-		// }
+		 if(policy_shock){
+		 VAR.CGTDiscount = previous_CGT;	
+		 }
 
 		if (tick == (double) params.getInteger("policyShock")) {
 

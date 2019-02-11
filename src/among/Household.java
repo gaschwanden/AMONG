@@ -120,31 +120,23 @@ public class Household implements Comparable<Household> {
 
 	@ScheduledMethod(start = 1, interval = 1, priority = 997)
 	public void makeDecision() {
-		
-//		System.out.println("\nDecision making HH "+ID);
-//		" with investment horizon
-		// "+investment_horizon);
-		// double expectation_property = global.property_market.getMarketProspect((int) investment_horizon * (int) CONST.year_ticks); //old function
 		double expectation_property = global.property_market.getAverageMarketProspect((int) investment_horizon * (int) CONST.year_ticks);
 		double expectation_alternative = global.alternative_market.getMarketProspect();
 		double disposable_income = getDisposableIncome();
-		// System.out.println("Prospect property market "+expectation_property);
-		// System.out.println("Prospect alternative market "+expectation_alternative);
-		// System.out.println("Disposable income "+disposable_income);
-
 		double projected_loan = global.bank.affordableLoan(assets, state, out_rent, disposable_income);
 		double projected_value = projected_loan / (1 - CONST.downpayment);
 
 		double projected_deposit = projected_value - projected_loan;
-		// TODO projected sale prices over long investment horizon given high
-		// expectations are not realistic
 		double affordable_price = projected_value * Math.pow(1.0 + expectation_property, investment_horizon);
-		// System.out.println("Resulting deposit "+projected_deposit);
-		// System.out.println("Projected sale price "+projected_sale_price);
+
 
 		if (state == State.RENTER) {
 			if (assets > CONST.minDeposit && disposable_income > 0) {
+				
+				/////////////////////
 				// NPV of buying
+				/////////////////////
+
 				double one_off_costs_buy = projected_deposit
 						+ global.property_market.transactionCostBuyer(projected_value) - CONST.FHOG;
 
@@ -162,14 +154,13 @@ public class Household implements Comparable<Household> {
 						* Math.pow((1 - CONST.valueDepreciation), investment_horizon)
 						- global.property_market.transactionCostSeller(affordable_price) - projected_loan)
 						/ Math.pow(1 + CONST.governmentBondYield, investment_horizon);
-				// System.out.println("Depreciation in percent "+(1 - Math.pow((1 -
-				// CONST.valueDepreciation), investment_horizon) ));
-				// System.out.println("Benefits of buying total "+benefits_buy);
-				// System.out.println("One of costs to buy "+one_off_costs_buy);
-				// System.out.println("Ongoing costs "+ongoing_costs_buy);
 				double npv_buy = benefits_buy - one_off_costs_buy - ongoing_costs_buy;
 
+				
+				/////////////////////
 				// NPV of renting
+				/////////////////////
+
 				double one_off_costs_rent = CONST.rentalBond * out_rent;
 
 				double rent_sum = 0;
@@ -218,8 +209,7 @@ public class Household implements Comparable<Household> {
 						- (one_off_costs_buy - one_off_costs_rent);
 
 				double npv_rent = benefits_rent - one_off_costs_rent - ongoing_costs_rent;
-				// System.out.println("NPV buy "+npv_buy);
-				// System.out.println("NPV rent "+npv_rent);
+
 				if (npv_buy > npv_rent) {
 					buy = true;
 					buy_affordable_price = projected_value;
@@ -227,23 +217,26 @@ public class Household implements Comparable<Household> {
 				}
 			}
 		} else {
+			// not a Renter
+
 			for (Property p : housholdProperties) {
 
 				if(p.OnMarket){
+					// Reduce Price if property has not been sold before
 					p.reservePrice = p.reservePrice*Math.pow(1 - (CONST.reducedReserveOvertime / 100),p.timeOnMarket / CONST.year_ticks);
 				}else{
-//					System.out.println(housholdProperties.size()+" # "+ID+" ; "+investment_horizon);
+					// calculate price for for potential sale
 					p.updateReservePriceByLocation(this);
-				}
+				}		
 				
-				
-				if (p.getTimeSinceTransaction() > investment_horizon * CONST.year_ticks - (int)(Math.random()*51)
-						|| p.reservePrice - 2 * global.property_market.transactionCostBuyer(p.getValue()) == p.getValue() 
-						|| assets < 0
+				if (p.getTimeSinceTransaction() > investment_horizon * CONST.year_ticks - (int)(Math.random()*51) 				//selling after investment horizon
+						|| p.reservePrice - 2 * global.property_market.transactionCostBuyer(p.getValue()) == p.getValue() 		//selling if the market has potential
+						|| assets < 0																							//selling if under financial stress
 						) {
-					if (assets < 0) {
+					if (assets < 0) { // selling at discount since under preassure
 						p.reservePrice -= p.reservePrice * CONST.reducedReserve;
 					}
+					
 					global.property_market.registerPropertyForSale(this, p);
 					p.OnMarket = true;
 					p.timeOnMarket++;
@@ -251,7 +244,7 @@ public class Household implements Comparable<Household> {
 				}
 			}
 
-			if (expectation_property < -CONST.stableMargin && state == State.INVESTOR) {
+			if (expectation_property < -CONST.stableMargin && state == State.INVESTOR) { // putting on market if market is hot
 				int property_index = global.rnd.nextInt(housholdProperties.size());
 				Property propertyToSell = housholdProperties.get(property_index);
 
@@ -284,8 +277,7 @@ public class Household implements Comparable<Household> {
 						(int) (investment_horizon * CONST.year_ticks));
 				double valuation_invest = projected_stock_sale + investment_return - projected_investment - cgt;
 
-				// System.out.println("Valuation buy "+valuation_buy);
-				// System.out.println("Valuation invest "+valuation_invest);
+
 				if (valuation_buy > valuation_invest) {
 					buy = true;
 					buy_affordable_price = projected_value;
@@ -329,7 +321,6 @@ public class Household implements Comparable<Household> {
 		if (buy) {
 			ArrayList<Auction> auctions = global.property_market.getAuctions();
 			for (Auction a : auctions) {
-				// if(a.property == null)continue;
 				if (a.getReservePrice() <= buy_affordable_price && Math.random()<0.2) {
 					double actual_bid = calculateBid(a.property);
 					if (actual_bid <= buy_affordable_price) {
@@ -357,7 +348,6 @@ public class Household implements Comparable<Household> {
 
 		// if(Math.random()<0.8){
 		actual_bid = calculateBidByTime(p)+calculateNPVtaxDeduction(p);
-		
 		// }else {
 		// actual_bid = calculateBidByNeighbors(p);
 		// }
@@ -366,7 +356,6 @@ public class Household implements Comparable<Household> {
 	}
 
 	private double calculateNPVtaxDeduction(Property p) {
-		// TODO Auto-generated method stub
 		double totalCost = p.getCost()+p.value_previous*0.8*VAR.irMortgage;
 		double totalDeductions = totalCost*tax_perCent;
 		double NPVtotalDeductions = totalDeductions;//totalDeductions/VAR.inflation; xxx this should be calculated like this but makes huge numbers
@@ -430,7 +419,6 @@ public class Household implements Comparable<Household> {
 						* (Math.pow(1 + global.property_market.getAverageMarketProspectAt(current) - CONST.bidVariation,
 								1 / CONST.year_ticks));
 			}
-
 		}
 		return actual_bid;
 	}
