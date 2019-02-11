@@ -28,6 +28,9 @@ public class PropertyMarket {
 	private int cnt_remaining;
 	private int cnt_developer;
 
+	private ArrayList<Double> averageAAR;
+	private ArrayList<Double> currentTickTransactionAAR;
+
 	public PropertyMarket(Universe u) {
 		global = u;
 		auctions = new ArrayList<Auction>();
@@ -35,6 +38,8 @@ public class PropertyMarket {
 		avg_property_values = new ArrayList<Double>();
 		sold_properties = new ArrayList<ArrayList<Property>>();
 		annualReturnsList = new ArrayList<Double>();
+		averageAAR = new ArrayList<Double>();
+		currentTickTransactionAAR = new ArrayList<Double>();
 	}
 
 	/**
@@ -48,8 +53,8 @@ public class PropertyMarket {
 		cnt_auctions = auctions.size();
 		cnt_completed = 0;
 		// System.out.println("----EXECUTING AUCTIONS");
-		ArrayList<Double> tv = new ArrayList<Double>();
-		ArrayList<Property> ps = new ArrayList<Property>();
+		ArrayList<Double> transactionValue = new ArrayList<Double>();
+		ArrayList<Property> propertySold = new ArrayList<Property>();
 		Collections.sort(auctions);
 		Iterator<Auction> ait = auctions.iterator();
 		while (ait.hasNext()) {
@@ -69,11 +74,17 @@ public class PropertyMarket {
 					h = b.get(1);
 				}
 				double buying_price = h.getAmount();
-				// System.out.println("Buying price is "+buying_price+" with current property
-				// value "+a.getProperty().getValue()+" and reserve price
-				// "+a.getReservePrice()+" by buyer "+buyer);
-				tv.add(buying_price);
-				ps.add(a.getProperty());
+//				System.out.println(
+//						"tick,"+(int)global.tick+
+//						",propertyID,"+a.property.ID+
+//						",BuyingPrice,"+(int)buying_price+
+//						",currentPropertyValue,"+(int)a.getProperty().getValue()+
+//						",reservePrice,"+(int)a.getReservePrice()+
+//						",intialPrice,"+ (int)a.property.getValueInitial()+
+//						",previousPrice,"+(int)a.property.getValuePrevious()+
+//						",buyerID,"+buyer.getID());
+				transactionValue.add(buying_price);
+				propertySold.add(a.getProperty());
 				transferProperty(a.getSeller(), buyer, a.getProperty(), buying_price);
 				ait.remove();
 				for (Auction r : auctions) {
@@ -82,8 +93,8 @@ public class PropertyMarket {
 				cnt_completed++;
 			}
 		}
-		transaction_values.add(tv);
-		sold_properties.add(ps);
+		transaction_values.add(transactionValue);
+		sold_properties.add(propertySold);
 		clearAuctions();
 		avg_property_values.add(global.soldValue());
 	}
@@ -102,6 +113,7 @@ public class PropertyMarket {
 				it.remove();
 			}
 		}
+//		auctions.removeAll(auctions);
 		cnt_developer = auctions.size();
 		// System.out.println("Auctions cleared, remaining: "+auctions.size());
 	}
@@ -115,8 +127,15 @@ public class PropertyMarket {
 	 * @param p
 	 *            The Property to be sold.
 	 */
-	public void registerPropertyForSale(Household s, Property p, double price) {
-		Auction a = new Auction(s, p, price);
+	public void registerPropertyForSale(Household s, Property p) {
+		Integer qualy = p.quality;
+		Auction a = new Auction(s, p, p.reservePrice,qualy);
+		auctions.add(a);
+	}
+	
+	public void registerPropertyForSale(Household s, Property p, double reservePrice) {
+		Integer qualy = p.quality;
+		Auction a = new Auction(s, p, reservePrice,qualy);
 		auctions.add(a);
 	}
 
@@ -238,41 +257,57 @@ public class PropertyMarket {
 		return cnt_developer;
 	}
 
-	public double getAnticipatedAnnualReturn() {
-		// TODO this isnt just right yet
+	public void makeAverageAnticipatedAnnualReturn(){
 		int sz = sold_properties.size();
 		if (sz <= 1) {
 			annualReturnsList.add(0.0);
-			return 0;
 		}
-		int ts = sold_properties.get(sz - 2).size();
-		if (ts == 0) {
+		int soldProperties = sold_properties.get(sz - 2).size();
+		if (soldProperties == 0) {
 			annualReturnsList.add(0.0);
-			return 0;
 		}
 		double aar = 0;
 		for (Property p : sold_properties.get(sz - 2)) {
-			double p0 = p.getpreviousTransationValue();
-			double pt = p.getTransationValue();
-			double t = p.getPreviousTimeSinceTransaction();
-			double aar_p = Math.exp(Math.log(pt / p0) / (t / CONST.year_ticks)) - 1;
-			//// if(Math.abs(aar_p)>0.10){
-			// System.out.println();
-			// System.out.println("Current Value (pt) of "+p.getID()+": "+pt);
-			// System.out.println("Previous value (p): "+p0);
-			// System.out.println("Timeperiod: "+t);
-			// System.out.println("Resulting AAR: "+aar_p);
-			// System.out.println("ID = "+p.getID());
-			//// }
+			double aar_p = makeAAR(p);
 			aar += aar_p;
-
+			currentTickTransactionAAR.add(aar_p);
+//			System.out.println(p.ID+" = "+aar_p);
 		}
-		aar /= ts;
+		aar /= soldProperties;
 		// System.out.println();
 		// System.out.println();
 		//
 		// System.out.println("AAR "+aar+" for "+ts+" transactions");
 		annualReturnsList.add(aar);
+	}
+	
+	public double getAnticipatedAnnualReturn() {
+		int sz = sold_properties.size();
+		if (sz <= 1) {
+			annualReturnsList.add(0.0);
+			return 0;
+		}
+		int soldProperties = sold_properties.get(sz - 2).size();
+		if (soldProperties == 0) {
+			annualReturnsList.add(0.0);
+			return 0;
+		}
+		double aar = 0;
+		for (Property p : sold_properties.get(sz - 2)) {
+			double aar_p = makeAAR(p);
+			aar += aar_p;
+			currentTickTransactionAAR.add(aar_p);
+			System.out.println(p.ID+" = "+aar_p);
+		}
+		aar /= soldProperties;
+		// System.out.println();
+		// System.out.println();
+		//
+		// System.out.println("AAR "+aar+" for "+ts+" transactions");
+		annualReturnsList.add(aar);
+//		for(int i = 0; i<annualReturnsList.size();i++){
+//			System.out.println((int)global.tick+","+i+","+annualReturnsList.get(i));
+//		}
 		// Printing out the Anticipated Annual Returns
 		// System.out.println("printing aars at
 		// "+RunEnvironment.getInstance().getCurrentSchedule().getTickCount());
@@ -284,44 +319,121 @@ public class PropertyMarket {
 		return aar;
 	}
 
-	public double getAnticipatedAnnualReturn(int time) {
-		// TODO hwo to calculate the average annual return from the list of saved
-		// annualized returns?
-		int sz = annualReturnsList.size();
-		if (sz == 0) {
-			return 0;
-		}
-		if (time >= sz) {
-			return (annualReturnsList.get(sz - 1) + annualReturnsList.get(0)) / 2.0;
-		}
-		return (annualReturnsList.get(sz - 1) + annualReturnsList.get(sz - time - 1)) / 2.0;
+	private double makeAAR(Property p) {
+	// if(Math.abs(aar_p)>0.10){
+//				 System.out.println();
+//				 System.out.println("Current Value (pt) of "+p.getID()+": "+(int)p.value);
+//				 System.out.println("Previous value (p): "+(int)p.value_previous);
+//				 System.out.println("Timeperiod: "+p.getTimeSinceTransaction());
+//				 System.out.println(global.tick);
+//				 
+		double p0 = p.getpreviousTransationValue();
+		double pt = p.getTransationValue();
+		double t = p.getPreviousTimeSinceTransaction();
+		double aar_p = Math.exp(Math.log(pt / p0) / (t / CONST.year_ticks)) - 1;
+//		System.out.println("Resulting AAR: "+aar_p);
+		return aar_p;
 	}
 
-	public double getAnticipatedAnnualReturn(int start, int time) {
-		int ls = avg_property_values.size();
-		double avg_now = avg_property_values.get(ls - 1);
-		if (ls > time) {
-			avg_now = avg_property_values.get(ls - time - 1);
-		}
+//	public double getAnticipatedAnnualReturn(int time) {
+//		int sz = annualReturnsList.size();
+//		if (sz == 0) {
+//			return 0;
+//		}
+//		if (time >= sz) {
+//			return (annualReturnsList.get(sz - 1) + annualReturnsList.get(0)) / 2.0;
+//		}
+//		return (annualReturnsList.get(sz - 1) + annualReturnsList.get(sz - time - 1)) / 2.0;
+//	}
 
-		double avg_past = avg_property_values.get(0);
-		if (ls - start - time > 0) {
-			avg_past = avg_property_values.get(ls - start - time - 1);
-		}
+//	public double getAnticipatedAnnualReturn(int start, int time) {
+//		int ls = avg_property_values.size();
+//		double avg_now = avg_property_values.get(ls - 1);
+//		if (ls > time) {
+//			avg_now = avg_property_values.get(ls - time - 1);
+//		}
+//
+//		double avg_past = avg_property_values.get(0);
+//		if (ls - start - time > 0) {
+//			avg_past = avg_property_values.get(ls - start - time - 1);
+//		}
+//
+//		return (avg_now - avg_past) / avg_past;
+//	}
 
-		return (avg_now - avg_past) / avg_past;
+//	public double getMarketProspect(int time) {
+//		double magnitude = global.rnd.nextDouble();
+//		boolean sign = global.rnd.nextBoolean();
+//
+//		if (sign) {
+//			magnitude *= -1;
+//		}
+//		magnitude *= CONST.marketVariance;
+//		magnitude += getAnticipatedAnnualReturn(time);
+//
+//		return magnitude;
+//	}
+
+	public double getAverageMarketProspectAt (int time){
+		if((int)global.tick-time<0){
+			return 0.07;
+		}else{
+			return averageAAR.get((int)global.tick-time);
+		}
 	}
+	
+	public double getAverageMarketProspect(int timeperiod) {
 
-	public double getMarketProspect(int time) {
 		double magnitude = global.rnd.nextDouble();
 		boolean sign = global.rnd.nextBoolean();
-
+		double average=0.0;
+//		int ticker = 0;
 		if (sign) {
 			magnitude *= -1;
 		}
 		magnitude *= CONST.marketVariance;
-		magnitude += getAnticipatedAnnualReturn(time);
+		
 
-		return magnitude;
+//		System.out.println("averageAAR.size = "+averageAAR.size()+"; and timeperiod = "+timeperiod);
+		for(int i = 0; i<timeperiod;i++){
+			int index = averageAAR.size()-timeperiod+i;
+			if(index<0){
+				average = average + 0.07;
+//				System.out.println("average before"+average);
+			}else{
+				average = average + averageAAR.get(index);//+magnitude;
+			}
+		}
+		
+		average = average/timeperiod;
+//		System.out.println((int)global.tick+"; averageAAR.size = "+averageAAR.size()+"; timeperiod = "+timeperiod +"; average = "+average);
+
+		return average;
 	}
+	
+	@ScheduledMethod(start = 1, interval = 1, priority = 991)
+
+	public void makeAverageMarketProspect(){
+		double average=0;
+		if(currentTickTransactionAAR.size()==0){
+			averageAAR.add(0.0);
+		}else{
+		for(int i = 0; i<currentTickTransactionAAR.size();i++){
+			average =+ currentTickTransactionAAR.get(i);
+		}
+		average = average/currentTickTransactionAAR.size();
+		averageAAR.add(average);
+		currentTickTransactionAAR.clear();
+		}
+		
+		
+	}
+
+	public double getAverageAnticipatedAnnualReturn() {
+		double AAR = averageAAR.get(averageAAR.size()-1);
+		if (AAR>0.2){AAR = 0.2;};
+		return AAR;
+	}
+
+	
 }

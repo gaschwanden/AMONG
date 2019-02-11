@@ -14,12 +14,14 @@ public class Auction implements Comparable<Auction> {
 	private Household seller;
 	public Property property;
 	private double reserve_price;
+	private Integer qualityBraket;
 
 	private ArrayList<Bid> bids;
 
-	public Auction(Household s, Property p, double price) {
+	public Auction(Household s, Property p, double price, Integer q) {
 		seller = s;
 		property = p;
+		qualityBraket = q;
 		reserve_price = price;
 		bids = new ArrayList<Bid>();
 	}

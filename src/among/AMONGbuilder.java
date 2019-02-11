@@ -52,12 +52,15 @@ public class AMONGbuilder implements ContextBuilder<Object> {
 			Household h = new Household(global);
 			global.households.add(h);
 			context.add(h);
-			int time = (int) (Math.random() * 52);
-			Property p = new Property(global, time);
-			global.properties.add(p);
-			context.add(p);
-
-			h.addProperty(p);
+			
+			if(Math.random()<1.1){ //XXX income and asset dependent addition of properties
+				int time = (int) (Math.random() * h.getInvestmentHorizon())+1;
+				Property p = new Property(global, time);
+				global.properties.add(p);
+				context.add(p);
+				h.addProperty(p);
+			}
+			
 		}
 		global.initialize();
 
