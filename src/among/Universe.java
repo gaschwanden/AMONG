@@ -1,12 +1,18 @@
 package among;
 
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
+
+import among.Household.State;
+
+import java.io.File;
+import java.io.FileOutputStream;
 
 import au.edu.unimelb.eresearch.repast.parameterswrapper.ChartsWrapper;
 import au.edu.unimelb.eresearch.repast.parameterswrapper.ParametersWrapper;
@@ -49,6 +55,19 @@ public class Universe {
 	private double previous_income;
 	private double previous_NG;
 	private double previous_CGT;
+	public double tick;
+	private boolean writePropertyPrices;
+	private boolean  writeHousholdInformation;
+	private boolean writeGlobalInformation;
+
+	//public String fnpp;
+	private Writer fnpp;
+	private File file;
+	private File file2;
+	private File file3;
+	private PrintWriter writerProperty;
+	private PrintWriter writerHousholds;
+	private PrintWriter writerGlobal;
 
 	public Universe(long seed) {
 		rnd = new Random(seed);
@@ -62,6 +81,10 @@ public class Universe {
 		supply_shock = false;
 		demand_shock = false;
 		income_shock = false;
+		writePropertyPrices = true;
+		writeHousholdInformation = true;
+		writeGlobalInformation = true;
+
 	}
 
 	@ScheduledMethod(start = 1, interval = 1, priority = 994)
@@ -82,12 +105,85 @@ public class Universe {
 		 */
 		setPercentiles();
 	}
+	@ScheduledMethod(start = 1, interval = 1, priority = 992)
+	public void dataCollectionAlways() throws Exception {
+
+		if(writePropertyPrices){
+			data_collection_count++;
+			//Context<Object> context = ContextUtils.getContext(this);
+			//IndexedIterable<Object> ii = context.getObjects(Household.class);
+		    if(file == null){
+		    	file = new File ("snapshot_property.txt");
+		    }
+			if(writerProperty == null){
+				writerProperty = new PrintWriter("snapshot_property.txt");
+				writerProperty.println("tick,ID,value_initial,value,value_previous,value_projected,time_since_transaction,transactions,timeOnMarket");
+			} else{
+				writerProperty = new PrintWriter(new FileOutputStream(new File("snapshot_property.txt"),true));
+			}
+			
+			for(int i =0;i<properties.size();i++){
+				Property p = properties.get(i);
+				writerProperty.println((int)tick+","+p.ID+"," +(int)p.getValueInitial()+","+(int)p.getValue()+","+(int)p.getValuePrevious()+","+(int)p.getValueProjected()+","+(int)p.time_since_transaction+","+(int)p.transactions+","+(int)p.timeOnMarket);
+			}
+			writerProperty.close();
+		}
+		if(writeHousholdInformation){
+
+		    if(file2 == null){
+		    	file2 = new File ("snapshot_housholds.txt");
+		    }
+			if(writerHousholds == null){
+				writerHousholds = new PrintWriter("snapshot_housholds.txt");
+				writerHousholds.println("tick,ID,asset_initial,asset,investmenthorizon,numberOfProperties");
+			} else{
+				writerHousholds = new PrintWriter(new FileOutputStream(new File("snapshot_housholds.txt"),true));
+			}
+			
+			for(int i =0;i<households.size();i++){
+				 Household h = households.get(i);
+				 writerHousholds.println((int)tick+","+h.getID()+"," +(int)h.getAssetsInitial()+","+(int)h.getAssets()+","+(int)h.getInvestmentHorizon()+","+h.getProperties().size());
+			}
+			writerHousholds.close();
+		}
+		
+		if(writeGlobalInformation){
+
+		    if(file3 == null){
+		    	file3 = new File ("snapshot_global.txt");
+		    }
+			if(writerGlobal == null){
+				writerGlobal = new PrintWriter("snapshot_global.txt");
+				writerGlobal.println("tick,totalLiquidAssets,totalPropertyAssets,renters,owners,investors");
+			} else{
+				writerGlobal = new PrintWriter(new FileOutputStream(new File("snapshot_global.txt"),true));
+			}
+			int renters = 0;
+			int owners = 0;
+			int investors = 0;
+			double totalLiquidAssets = 0;
+			double totalPropertyAssets = 0;
+			for(int i =0;i<households.size();i++){
+				 Household h = households.get(i);
+				 if(State.RENTER==h.getState())renters++;
+				 if(State.OWNER==h.getState())owners++;
+				 if(State.INVESTOR==h.getState())investors++;
+				 totalLiquidAssets += h.getAssets();
+				 
+			}
+			for (Property property : properties) {
+				totalPropertyAssets+= property.value;
+			}
+			writerGlobal.println((int)tick+","+totalLiquidAssets+"," +totalPropertyAssets+"," +renters+","+owners+","+investors);
+			writerGlobal.close();
+		}
+	}
 
 	@ScheduledMethod(start = 1, interval = 52, priority = 993)
 	public void dataCollection() throws Exception {
 
 		Parameters params = ParametersWrapper.getInstance().getParameters();
-
+		
 		if (params.getBoolean("csv")) {
 			data_collection_count++;
 			Context<Object> context = ContextUtils.getContext(this);
@@ -119,9 +215,9 @@ public class Universe {
 						FHO++;
 					}
 				}
-				writerhh.println("R: " + R);
-				writerhh.println("O: " + O);
-				writerhh.println("I: " + I);
+				writerhh.println("Renter: " + R);
+				writerhh.println("Owner: " + O);
+				writerhh.println("Inestor: " + I);
 				writerhh.println("FHOS: " + FHO);
 
 				IndexedIterable<Object> ip = context.getObjects(Property.class);
@@ -144,7 +240,7 @@ public class Universe {
 
 	@ScheduledMethod(start = 1, interval = 1, priority = 992)
 	public void eventChecker() {
-		double tick = RunEnvironment.getInstance().getCurrentSchedule().getTickCount();
+		tick = RunEnvironment.getInstance().getCurrentSchedule().getTickCount();
 		Parameters params = ParametersWrapper.getInstance().getParameters();
 
 		// System.out.println(tick);
@@ -219,8 +315,9 @@ public class Universe {
 	}
 
 	private void updatePropertyMarketValue() {
-		double aar = property_market.getAnticipatedAnnualReturn();
-		// System.out.println("aar = "+aar);
+		property_market.makeAverageAnticipatedAnnualReturn();
+		double aar = property_market.getAverageAnticipatedAnnualReturn();
+//		System.out.println("aar = "+aar);
 		for (Property p : properties)
 			p.updateMarketValueProperty(aar);
 	}
@@ -337,7 +434,7 @@ public class Universe {
 		context.getObjects(PropertyMarket.class).forEach(o -> {
 			final PropertyMarket p = (PropertyMarket) o;
 
-			data.merge("aar", p.getAnticipatedAnnualReturn(), Double::sum);
+			data.merge("aar", p.getAverageAnticipatedAnnualReturn(), Double::sum);
 
 			data.merge("auctions_auctions", (double) p.getAuctionsTotal(), Double::sum);
 			data.merge("auctions_completed", (double) p.getAuctionsCompleted(), Double::sum);
@@ -403,20 +500,22 @@ public class Universe {
 		// System.out.println("getAveragePropertyMarketValue =
 		// "+vsum/properties.size());
 
-		return (vsum / properties.size());
+		return (vsum / (properties.size()+1));
 	}
 
 	public double getAveragePropertyValue() {
 		double vsum = 0;
-		int timer = 0;
+		int counter = 0;
+		int movingAveragePeriod = 1;
+		// TODO add second param to make moving average
 		for (Property p : properties) {
-			if (p.getTimeSinceTransaction() > 1) {
+			if (p.getTimeSinceTransaction() > movingAveragePeriod) {
 				vsum += p.getTransationValue();
-				timer++;
+				counter++;
 			}
 		}
 		// System.out.println("getAveragePropertyBookValue = "+vsum/timer);
-		return (vsum / timer);
+		return (vsum / counter);
 	}
 
 	public void setPercentiles() {
@@ -453,6 +552,32 @@ public class Universe {
 			}
 		}
 		return tax;
+	}
+	
+	public double getTaxPercent(double incomeAmount){
+		double initalIncomeAmount = incomeAmount;
+		if (incomeAmount < 0) {
+			return 0.0;
+		} else {
+		double tax_percent = 0;
+		int bracketCount = CONST.tax_brackets.length;
+		if (incomeAmount > CONST.tax_brackets[bracketCount - 1]) {
+			double base = CONST.base_tax[bracketCount - 1];
+			double variable = CONST.income_tax[bracketCount - 1] * (incomeAmount - CONST.tax_brackets[bracketCount - 1]);
+			tax_percent = (base + variable)/initalIncomeAmount;
+		} else {
+			for (int i = 0; i < bracketCount - 1; i++) {
+				if (incomeAmount <= CONST.tax_brackets[i + 1]) {
+					double base = CONST.base_tax[i];
+					double variable = CONST.income_tax[i] * (incomeAmount - CONST.tax_brackets[i]);
+					tax_percent = (base + variable)/initalIncomeAmount;
+					break;
+				}
+			}
+		}
+//		System.out.println("from "+incomeAmount+" Real Tax income amount = "+ tax_percent);
+		return tax_percent;
+		}
 	}
 
 	public double projectedIT(double amount) {

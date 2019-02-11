@@ -6,7 +6,7 @@ public class VAR {
 
 	public static double propertyGrowth = 0.021;
 	public static double householdGrowth = 0.021;
-	public static double wageGrowth = 0.0; // 0.011
+	public static double wageGrowth = 0.011; // 0.011
 
 	public static double irSavings = 0.015; // Savings interest rate
 	public static double irMortgage = 0.0561; // Mortgage interest rate
@@ -14,4 +14,6 @@ public class VAR {
 
 	public static double CGTDiscount = 0.5;
 	public static double negativeGearing = 0.5;
+	public static double inflation = 0.02;
+	
 }

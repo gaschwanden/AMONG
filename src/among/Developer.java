@@ -25,8 +25,7 @@ public class Developer {
 	public ArrayList<Property> delayedSupplyResponse() {
 		// TODO replace constants
 		double tick = RunEnvironment.getInstance().getCurrentSchedule().getTickCount();
-		double anticipated_return = global.property_market.getAnticipatedAnnualReturn(10 * (int) CONST.year_ticks,
-				12 * (int) CONST.year_ticks);
+		double anticipated_return = global.property_market.getAverageMarketProspect(12 * (int) CONST.year_ticks);
 		anticipated_return /= 2.0;
 
 		int increaseProperty = (int) Math.ceil((anticipated_return * CONST.property_ID) / CONST.year_ticks);

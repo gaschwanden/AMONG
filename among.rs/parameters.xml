@@ -63,7 +63,7 @@
 									
 		/>
 				<parameter name="households" displayName="Households" type="int" 
-						defaultValue="1000" 
+						defaultValue="100" 
 						isReadOnly="false" 
 						converter="repast.simphony.parameter.StringConverterFactory$IntConverter"
 									

@@ -20,7 +20,7 @@
       <repast.simphony.data2.engine.MethodDataSourceDefinition>
         <id>AAR</id>
         <className>among.PropertyMarket</className>
-        <methodName>getAnticipatedAnnualReturn</methodName>
+        <methodName>getAverageAnticipatedAnnualReturn</methodName>
         <aggType>SUM</aggType>
       </repast.simphony.data2.engine.MethodDataSourceDefinition>
     </entry>
