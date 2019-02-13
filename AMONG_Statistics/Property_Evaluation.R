@@ -41,6 +41,11 @@ plot_variance = ggplot(properties_mean_Value, aes(tick)) +
   geom_line(aes(y = variance_ValuePreviously, colour = "variance_ValuePreviously"))
 plot_variance
 
+snapshot_property$error = snapshot_property$value_projected/snapshot_property$value_transaction
+
+temporary_property =   subset(snapshot_property,snapshot_property$value_projected > 0) 
+mean((temporary_property$value_projected/temporary_property$value_transaction))
+
 #### Eval Housholds ####
 
 households_mean_Value = snapshot_housholds %>%

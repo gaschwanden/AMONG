@@ -185,7 +185,6 @@ public class Property implements Comparable<Property> {
 	}
 
 	public double getAAR() {
-		// TODO Auto-generated method stub
 		return AAR;
 	}
 
@@ -193,7 +192,6 @@ public class Property implements Comparable<Property> {
 	public void updateReservePriceByLocation(Household h) {
 		double localAAR = 0;
 		for(int i = ID-(int)h.investment_horizon;i<ID+h.investment_horizon;i++){
-//			System.out.println("try");
 			// Control for property array range
 			int k = i;
 			
@@ -211,8 +209,8 @@ public class Property implements Comparable<Property> {
 			}
 		}
 		localAAR = localAAR/(2*(int)h.investment_horizon);
-		reservePrice = value_previous* Math.pow(1+localAAR, time_since_transaction);
-		reservePrice = reservePrice*Math.pow(1 - (CONST.reducedReserveOvertime / 100),timeOnMarket / CONST.year_ticks);
+		reservePrice = value_transaction* Math.pow(1+localAAR, time_since_transaction);
+				//value_previous* Math.pow(1+localAAR, time_since_transaction);
 		if(global.rnd.nextBoolean()){
 			reservePrice *= (1-CONST.bidVariation);
 		}else{

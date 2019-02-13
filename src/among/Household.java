@@ -21,16 +21,17 @@ public class Household implements Comparable<Household> {
 	private int ID;
 
 	private double assets_initial;
-	private double assets;
+	public double assets;
 	private State state;
 
-	private double in_income;
+	public double in_income;
 	private double tax_perCent;
 	private double in_rent;
 
 	private double out_living;
 	private double out_rent;
 	private double out_cost;
+	public int incomeDecile;
 
 	private ArrayList<Property> housholdProperties;
 
@@ -40,7 +41,7 @@ public class Household implements Comparable<Household> {
 	private boolean FHO;
 	private boolean buy;
 	private double buy_affordable_price;
-	private double buy_expected_sale_price;
+//	private double buy_expected_sale_price;
 	public boolean disapointedHoushold = false;
 
 	public Household(Universe u) {
@@ -63,6 +64,20 @@ public class Household implements Comparable<Household> {
 		tax_perCent = u.getTaxPercent(in_income);
 		buy = false;
 		FHO = false;
+//		incomeDecile = calculateIncomeDecile();
+	}
+
+	public void calculateIncomeDecile() {
+		incomeDecile = -1;
+		for(int i=0;i<CONST.income_deciles.length;i++){
+			if(in_income>CONST.income_deciles[i]){
+				continue;
+			}else{
+				incomeDecile = i;
+			}
+			
+		}
+		
 	}
 
 	@ScheduledMethod(start = 1, interval = 52, priority = 999)
@@ -75,6 +90,7 @@ public class Household implements Comparable<Household> {
 		income -= ng_discount;
 		double tax = global.incomeTax(income);
 		for (int i = 0; i < CONST.income_deciles.length; i++) {
+			// TODO Change that lost taxes are only added to one decile, the decile the 
 			if (income < CONST.income_deciles[i]) {
 				CONST.NGLost[i] += (original_tax - tax);
 				break;
@@ -124,10 +140,10 @@ public class Household implements Comparable<Household> {
 		double expectation_alternative = global.alternative_market.getMarketProspect();
 		double disposable_income = getDisposableIncome();
 		double projected_loan = global.bank.affordableLoan(assets, state, out_rent, disposable_income);
-		double projected_value = projected_loan / (1 - CONST.downpayment);
+		double max_lineOfCredit = projected_loan / (1 - CONST.downpayment);
 
-		double projected_deposit = projected_value - projected_loan;
-		double affordable_price = projected_value * Math.pow(1.0 + expectation_property, investment_horizon);
+		double anticipated_deposit = max_lineOfCredit - projected_loan;
+		double projected_price = max_lineOfCredit * Math.pow(1.0 + expectation_property, investment_horizon);
 
 
 		if (state == State.RENTER) {
@@ -137,23 +153,28 @@ public class Household implements Comparable<Household> {
 				// NPV of buying
 				/////////////////////
 
-				double one_off_costs_buy = projected_deposit
-						+ global.property_market.transactionCostBuyer(projected_value) - CONST.FHOG;
+				double one_off_costs_buy = anticipated_deposit
+						+ global.property_market.transactionCostBuyer(max_lineOfCredit) - CONST.FHOG;
 
 				double projected_sum = 0;
 				for (int i = 1; i < investment_horizon; i++) {
-					projected_sum += ((projected_loan * CONST.stdVariableRate) + CONST.maintenance * projected_value
-							+ CONST.councilRates * projected_value + CONST.buildingInsurance * projected_value)
+					projected_sum += ((projected_loan * CONST.stdVariableRate) 
+							+ CONST.maintenance * max_lineOfCredit
+							+ CONST.councilRates * max_lineOfCredit 
+							+ CONST.buildingInsurance * max_lineOfCredit)
 							/ Math.pow(1 + CONST.governmentBondYield, i);
 				}
-				double ongoing_costs_buy = projected_loan * CONST.stdVariableRate + CONST.maintenance * projected_value
-						+ CONST.councilRates * projected_value + CONST.buildingInsurance * projected_value
+				double ongoing_costs_buy = // TODO Check this whole calculation  
+						projected_loan * CONST.stdVariableRate 
+						+ CONST.maintenance * max_lineOfCredit
+						+ CONST.councilRates * max_lineOfCredit 
+						+ CONST.buildingInsurance * max_lineOfCredit
 						+ projected_sum;
 
-				double benefits_buy = (affordable_price
-						* Math.pow((1 - CONST.valueDepreciation), investment_horizon)
-						- global.property_market.transactionCostSeller(affordable_price) - projected_loan)
-						/ Math.pow(1 + CONST.governmentBondYield, investment_horizon);
+				double benefits_buy = (projected_price* Math.pow((1 - CONST.valueDepreciation), investment_horizon)
+						- global.property_market.transactionCostSeller(projected_price) 
+						- projected_loan)/ Math.pow(1 + CONST.governmentBondYield, investment_horizon);
+				
 				double npv_buy = benefits_buy - one_off_costs_buy - ongoing_costs_buy;
 
 				
@@ -176,8 +197,8 @@ public class Household implements Comparable<Household> {
 				double investment_sum = 0;
 				for (int i = 1; i < investment_horizon; i++) {
 					double sum = 0;
-					sum += ((projected_loan * CONST.stdVariableRate) + CONST.maintenance * projected_value
-							+ CONST.councilRates * projected_value + CONST.buildingInsurance * projected_value)
+					sum += ((projected_loan * CONST.stdVariableRate) + CONST.maintenance * max_lineOfCredit
+							+ CONST.councilRates * max_lineOfCredit + CONST.buildingInsurance * max_lineOfCredit)
 							- out_rent;
 					if (i % (int) CONST.renterMovingPeriod == 0) {
 						sum -= CONST.movingCost;
@@ -185,8 +206,8 @@ public class Household implements Comparable<Household> {
 					investment_sum += sum / Math.pow(1 + CONST.governmentBondYield, i);
 				}
 				double projected_investment = one_off_costs_buy - one_off_costs_rent
-						+ projected_loan * CONST.stdVariableRate + CONST.maintenance * projected_value
-						+ CONST.councilRates * projected_value + CONST.buildingInsurance * projected_value - out_rent
+						+ projected_loan * CONST.stdVariableRate + CONST.maintenance * max_lineOfCredit
+						+ CONST.councilRates * max_lineOfCredit + CONST.buildingInsurance * max_lineOfCredit - out_rent
 						+ investment_sum;
 
 				double dividend_sum = 0;
@@ -212,8 +233,8 @@ public class Household implements Comparable<Household> {
 
 				if (npv_buy > npv_rent) {
 					buy = true;
-					buy_affordable_price = projected_value;
-					buy_expected_sale_price = affordable_price;
+					buy_affordable_price = max_lineOfCredit;
+//					buy_expected_sale_price = affordable_price;
 				}
 			}
 		} else {
@@ -261,15 +282,15 @@ public class Household implements Comparable<Household> {
 			}
 
 			if (expectation_property > CONST.stableMargin && assets > CONST.minDeposit && disposable_income > 0) {
-				double holding_cost = (projected_loan * CONST.stdVariableRate + CONST.maintenance * projected_value
-						+ CONST.councilRates * projected_value + CONST.buildingInsurance * projected_value)
+				double holding_cost = (projected_loan * CONST.stdVariableRate + CONST.maintenance * max_lineOfCredit
+						+ CONST.councilRates * max_lineOfCredit + CONST.buildingInsurance * max_lineOfCredit)
 						* investment_horizon;
-				double rental_return = (CONST.rentReturn * projected_value) * investment_horizon;
-				double cgt = global.projectedCGT(affordable_price - projected_value,
+				double rental_return = (CONST.rentReturn * max_lineOfCredit) * investment_horizon;
+				double cgt = global.projectedCGT(projected_price - max_lineOfCredit,
 						(int) (investment_horizon * CONST.year_ticks));
-				double valuation_buy = affordable_price + rental_return - projected_value - holding_cost - cgt;
+				double valuation_buy = projected_price + rental_return - max_lineOfCredit - holding_cost - cgt;
 
-				double projected_investment = projected_deposit + holding_cost;
+				double projected_investment = anticipated_deposit + holding_cost;
 				double investment_return = (CONST.dividendYield * projected_investment) * investment_horizon;
 				double projected_stock_sale = projected_investment
 						* Math.pow(1 + expectation_alternative, investment_horizon);
@@ -280,8 +301,8 @@ public class Household implements Comparable<Household> {
 
 				if (valuation_buy > valuation_invest) {
 					buy = true;
-					buy_affordable_price = projected_value;
-					buy_expected_sale_price = affordable_price;
+					buy_affordable_price = max_lineOfCredit;
+//					buy_expected_sale_price = affordable_price;
 				}
 			}
 		}
@@ -321,7 +342,7 @@ public class Household implements Comparable<Household> {
 		if (buy) {
 			ArrayList<Auction> auctions = global.property_market.getAuctions();
 			for (Auction a : auctions) {
-				if (a.getReservePrice() <= buy_affordable_price && Math.random()<0.2) {
+				if (a.getReservePrice() <= buy_affordable_price && Math.random()<0.1) { // can the household afford it && limiting ability to bid in all auctions
 					double actual_bid = calculateBid(a.property);
 					if (actual_bid <= buy_affordable_price) {
 						a.registerInterestToBuy(this, actual_bid);
@@ -346,11 +367,18 @@ public class Household implements Comparable<Household> {
 
 		double actual_bid = 0;
 
-		// if(Math.random()<0.8){
+		 if(Math.random()<0.9){
 		actual_bid = calculateBidByTime(p)+calculateNPVtaxDeduction(p);
-		// }else {
-		// actual_bid = calculateBidByNeighbors(p);
-		// }
+		 }else {
+		 actual_bid = p.value_previous_transaction*Math.pow(1+VAR.propertyGrowth, (p.time_since_transaction/CONST.year_ticks));
+//		 	double p0 = p.getpreviousTransationValue();
+//			double pt = p.getTransationValue();
+//			double t = p.time_since_transaction;
+//			double aar_p = Math.exp(Math.log(actual_bid / p0) / (t / CONST.year_ticks)) - 1;
+//			if(aar_p>0.2){
+//				System.out.println("hello world");
+//			}
+		 }
 
 		return actual_bid;
 	}
@@ -431,7 +459,8 @@ public class Household implements Comparable<Household> {
 	 */
 
 	public void addProperty(Property p) {
-		p.setProjectedValue(buy_expected_sale_price);
+//		p.setProjectedValue(buy_expected_sale_price);
+		p.setProjectedValue(calculateProjectedValue(p));
 		housholdProperties.add(p);
 		Collections.sort(housholdProperties);
 		out_cost += p.getCost();
@@ -448,6 +477,15 @@ public class Household implements Comparable<Household> {
 			}
 			state = State.INVESTOR;
 		}
+	}
+
+	private double calculateProjectedValue(Property p) {
+		
+		double projectedValue = 0;
+		double averageAAR = global.property_market.getAARaverage((int)(global.tick-investment_horizon*CONST.year_ticks), (int)(global.tick));
+		projectedValue = p.value_previous_transaction*Math.pow((1+averageAAR),investment_horizon*CONST.year_ticks );// TODO  calculate projected value
+		
+		return projectedValue;
 	}
 
 	/**

@@ -111,14 +111,14 @@ public class Universe {
 		    
 			if(writerProperty == null){
 				writerProperty = new PrintWriter("snapshot_property.txt");
-				writerProperty.println("tick,ID,value_initial,value,value_previous,value_projected,time_since_transaction,transactions,timeOnMarket");
+				writerProperty.println("tick,ID,value_initial,value,value_previous,value_transaction,value_projected,time_since_transaction,transactions,timeOnMarket");
 			} else{
 				writerProperty = new PrintWriter(new FileOutputStream(new File("snapshot_property.txt"),true));
 			}
 			
 			for(int i =0;i<properties.size();i++){
 				Property p = properties.get(i);
-				writerProperty.println((int)tick+","+p.ID+"," +(int)p.getValueInitial()+","+(int)p.getValue()+","+(int)p.getValuePrevious()+","+(int)p.getValueProjected()+","+(int)p.time_since_transaction+","+(int)p.transactions+","+(int)p.timeOnMarket);
+				writerProperty.println((int)tick+","+p.ID+"," +(int)p.getValueInitial()+","+(int)p.getValue()+","+(int)p.getValuePrevious()+","+(int)p.getTransationValue()+","+(int)p.getValueProjected()+","+(int)p.time_since_transaction+","+(int)p.transactions+","+(int)p.timeOnMarket);
 			}
 			writerProperty.close();
 		}
@@ -148,7 +148,7 @@ public class Universe {
 		    }
 			if(writerGlobal == null){
 				writerGlobal = new PrintWriter("snapshot_global.txt");
-				writerGlobal.println("tick,totalLiquidAssets,totalPropertyAssets,renters,owners,investors");
+				writerGlobal.println("tick,totalLiquidAssets,totalPropertyAssets,renters,owners,investors,aar");
 			} else{
 				writerGlobal = new PrintWriter(new FileOutputStream(new File("snapshot_global.txt"),true));
 			}
@@ -168,7 +168,7 @@ public class Universe {
 			for (Property property : properties) {
 				totalPropertyAssets+= property.value;
 			}
-			writerGlobal.println((int)tick+","+totalLiquidAssets+"," +totalPropertyAssets+"," +renters+","+owners+","+investors);
+			writerGlobal.println((int)tick+","+totalLiquidAssets+"," +totalPropertyAssets+"," +renters+","+owners+","+investors+","+property_market.getAverageAnticipatedAnnualReturn());
 			writerGlobal.close();
 		}
 	}
@@ -428,7 +428,7 @@ public class Universe {
 			final PropertyMarket p = (PropertyMarket) o;
 
 			data.merge("aar", p.getAverageAnticipatedAnnualReturn(), Double::sum);
-
+			System.out.println("aar : "+p.getAverageAnticipatedAnnualReturn());
 			data.merge("auctions_auctions", (double) p.getAuctionsTotal(), Double::sum);
 			data.merge("auctions_completed", (double) p.getAuctionsCompleted(), Double::sum);
 			data.merge("auctions_remaining", (double) p.getAuctionsRemaining(), Double::sum);

@@ -143,26 +143,26 @@ public class PropertyMarket {
 	 * Method to transfer a Property from one Household to another following a
 	 * completed Auction.
 	 * 
-	 * @param f
+	 * @param seller
 	 *            The seller of the Property.
-	 * @param t
+	 * @param buyer
 	 *            The buyer of the Property.
 	 * @param p
 	 *            The Property to be transferred between seller and buyer.
 	 * @param b
 	 *            The Bid that won the Auction selling the Property.
 	 */
-	public void transferProperty(Household f, Household t, Property p, double b) {
+	public void transferProperty(Household seller, Household buyer, Property p, double b) {
 		// System.out.println("Transferring property "+p);
 		double cgt = 0;
-		if (f != null) {
-			global.capitalGainsTax((b - p.getTransationValue()), p.getTimeSinceTransaction(), f.getIncome());
-			f.removeProperty(p);
+		if (seller != null) {
+			global.capitalGainsTax((b - p.getTransationValue()), p.getTimeSinceTransaction(), seller.getIncome());
+			seller.removeProperty(p);
 		}
 		p.transactions++;
 		p.setValue(b);
 		p.resetTimeSinceTransaction();
-		t.addProperty(p);
+		buyer.addProperty(p);
 
 		double repayment = 0;
 		if (p.getMortgage() != null) {
@@ -185,9 +185,9 @@ public class PropertyMarket {
 		// System.out.println("Debit/credit difference: "+((b-loan) - (b-repayment)));
 		p.setMortgage(m);
 
-		t.debit(b - loan + transactionCostBuyer(b));
-		if (f != null) {
-			f.credit(b - repayment - cgt - transactionCostSeller(b));
+		buyer.debit(b - loan + transactionCostBuyer(b));
+		if (seller != null) {
+			seller.credit(b - repayment - cgt - transactionCostSeller(b));
 		}
 	}
 
@@ -271,13 +271,8 @@ public class PropertyMarket {
 			double aar_p = makeAAR(p);
 			aar += aar_p;
 			currentTickTransactionAAR.add(aar_p);
-//			System.out.println(p.ID+" = "+aar_p);
 		}
 		aar /= soldProperties;
-		// System.out.println();
-		// System.out.println();
-		//
-		// System.out.println("AAR "+aar+" for "+ts+" transactions");
 		annualReturnsList.add(aar);
 	}
 	
@@ -300,39 +295,29 @@ public class PropertyMarket {
 			System.out.println(p.ID+" = "+aar_p);
 		}
 		aar /= soldProperties;
-		// System.out.println();
-		// System.out.println();
-		//
-		// System.out.println("AAR "+aar+" for "+ts+" transactions");
 		annualReturnsList.add(aar);
-//		for(int i = 0; i<annualReturnsList.size();i++){
-//			System.out.println((int)global.tick+","+i+","+annualReturnsList.get(i));
-//		}
-		// Printing out the Anticipated Annual Returns
-		// System.out.println("printing aars at
-		// "+RunEnvironment.getInstance().getCurrentSchedule().getTickCount());
-		// for (int i = 0; i<annualReturnsList.size();i++){
-		// System.out.print(annualReturnsList.get(i)+",");
-		// System.out.println();
-		//
-		// }
 		return aar;
 	}
 
 	private double makeAAR(Property p) {
-	// if(Math.abs(aar_p)>0.10){
-//				 System.out.println();
-//				 System.out.println("Current Value (pt) of "+p.getID()+": "+(int)p.value);
-//				 System.out.println("Previous value (p): "+(int)p.value_previous);
-//				 System.out.println("Timeperiod: "+p.getTimeSinceTransaction());
-//				 System.out.println(global.tick);
-//				 
+
 		double p0 = p.getpreviousTransationValue();
 		double pt = p.getTransationValue();
 		double t = p.getPreviousTimeSinceTransaction();
 		double aar_p = Math.exp(Math.log(pt / p0) / (t / CONST.year_ticks)) - 1;
-//		System.out.println("Resulting AAR: "+aar_p);
 		return aar_p;
+	}
+	
+	public double getAARaverage(int start,int end){
+		double AARaverage = 0;
+
+		for(int i=start;i< end;i++){
+			if(i<0)continue;
+			if(i>=annualReturnsList.size())continue;
+			AARaverage += annualReturnsList.get(i);
+		}
+		
+		return AARaverage;		
 	}
 
 //	public double getAnticipatedAnnualReturn(int time) {
@@ -426,6 +411,7 @@ public class PropertyMarket {
 	}
 
 	public double getAverageAnticipatedAnnualReturn() {
+		if(averageAAR.size()==0) return VAR.propertyGrowth;
 		double AAR = averageAAR.get(averageAAR.size()-1);
 		if (AAR>0.2){AAR = 0.2;};
 		return AAR;

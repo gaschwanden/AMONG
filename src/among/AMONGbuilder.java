@@ -52,14 +52,30 @@ public class AMONGbuilder implements ContextBuilder<Object> {
 			Household h = new Household(global);
 			global.households.add(h);
 			context.add(h);
-			
-			if(Math.random()<1.1){ //XXX income and asset dependent addition of properties
+			//https://www.rba.gov.au/publications/rdp/2005/pdf/rdp2005-03.pdf
+			double probabilityOwningHouseByIncome = 1-(0.65+h.in_income*0.000001);
+			double probabilityOwningHouseByWealth = 1-(0.65+h.assets*0.00000025);
+			if(Math.random()<probabilityOwningHouseByIncome || Math.random()<probabilityOwningHouseByWealth){ 
 				int time = (int) (Math.random() * h.getInvestmentHorizon())+1;
 				Property p = new Property(global, time);
 				global.properties.add(p);
 				context.add(p);
 				h.addProperty(p);
+				if(Math.random()<0.25){
+//					int time = (int) (Math.random() * h.getInvestmentHorizon())+1;
+					Property p2 = new Property(global, time);
+					global.properties.add(p2);
+					context.add(p2);
+					h.addProperty(p2);
+				}
 			}
+			
+		}
+		global.setPercentiles();
+		for (int i = 0; i < global.households.size(); i++) {
+			Household h = global.households.get(i);
+			h.calculateIncomeDecile();
+			
 			
 		}
 		global.initialize();
