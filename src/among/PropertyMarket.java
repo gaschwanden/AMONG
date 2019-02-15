@@ -28,7 +28,7 @@ public class PropertyMarket {
 	private int cnt_remaining;
 	private int cnt_developer;
 
-	private ArrayList<Double> averageAAR;
+	public ArrayList<Double> averageAAR;
 	private ArrayList<Double> currentTickTransactionAAR;
 
 	public PropertyMarket(Universe u) {
@@ -60,17 +60,19 @@ public class PropertyMarket {
 		while (ait.hasNext()) {
 			Auction a = ait.next();
 			ArrayList<Bid> b = a.getBids();
-			// System.out.println("Auction "+a+" with # bids: "+b.size());
+//			if(b.size()>0){
+//				System.out.println("Auction "+a+" with # bids: "+b.size());				
+//			}
 			if (b.size() > 0) {
 				Collections.sort(b);
-				// if(a.property.getID()==14){
-				// for(Bid bids: b){
-				// System.out.println("bid ="+bids.getAmount());
-				// }
-				// }
+//				 if(a.property.getID()==606){
+//				 for(Bid bids: b){
+//				 System.out.println("bid ="+bids.getAmount());
+//				 }
+//				 }
 				Bid h = b.get(0);
 				Household buyer = h.getBidder();
-				if (b.size() > 1) {
+				if (b.size() > 1 && b.get(1).getAmount()>a.getProperty().reservePrice) {
 					h = b.get(1);
 				}
 				double buying_price = h.getAmount();
@@ -83,6 +85,16 @@ public class PropertyMarket {
 //						",intialPrice,"+ (int)a.property.getValueInitial()+
 //						",previousPrice,"+(int)a.property.getValuePrevious()+
 //						",buyerID,"+buyer.getID());
+				
+//				if(buying_price<a.getProperty().value_market){
+//					System.out.println(" bad price");
+					
+//				}
+				if(buying_price<a.getProperty().reservePrice){
+//					System.out.println(" bad price 2");
+					continue;
+				}
+				
 				transactionValue.add(buying_price);
 				propertySold.add(a.getProperty());
 				transferProperty(a.getSeller(), buyer, a.getProperty(), buying_price);
@@ -310,14 +322,19 @@ public class PropertyMarket {
 	
 	public double getAARaverage(int start,int end){
 		double AARaverage = 0;
+		int counter = 0;
 
 		for(int i=start;i< end;i++){
 			if(i<0)continue;
 			if(i>=annualReturnsList.size())continue;
 			AARaverage += annualReturnsList.get(i);
+			counter++;
 		}
-		
-		return AARaverage;		
+		if(AARaverage > 0 && counter>0){
+			return AARaverage/counter;
+		}else{
+			return 0;
+		}
 	}
 
 //	public double getAnticipatedAnnualReturn(int time) {

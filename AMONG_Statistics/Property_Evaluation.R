@@ -7,6 +7,8 @@ library(dplyr)
 library(ggthemes)
 
 options(scipen = 999)
+cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
 
 #### Load Data ####
 
@@ -15,6 +17,30 @@ snapshot_housholds <- read_csv("~/Desktop/AMONG_2019/snapshot_housholds.txt")
 snapshot_global <- read_csv("~/Desktop/AMONG_2019/snapshot_global.txt")
 
 View(snapshot_global)
+View(snapshot_housholds)
+View(snapshot_property)
+
+
+#### EVAL individual property ####
+
+house = subset(snapshot_property,snapshot_property$ID == 5275)
+house$AAR = snapshot_global$aar
+ggplot(house, aes(tick),fill=cond) +
+  geom_line(aes(y = value, colour = "value" ))+
+  geom_line(aes(y = value_projected, colour = "value_projected" ))+
+  geom_line(aes(y = value_previous, colour = "value_previous" ))+
+   geom_line(aes(y = value_Market, colour = "value_Market" ))+
+   geom_line(aes(y = value_reseve, colour = "value_reserve" ))+
+  geom_line(aes(y = value_initial, colour = "value_initial" ))+
+  scale_color_manual(values = c("blue","green","yellow","black", "darkblue","darkgreen")) 
+
+
+ggplot(house, aes(tick)) +
+  geom_line(aes(y = AAR*100,  colour = "AAR"))
+
+householdsEnd = subset(snapshot_housholds,snapshot_housholds$tick==max(snapshot_housholds$tick))
+View(householdsEnd)
+hist(householdsEnd$numberOfProperties)
 
 #### Eval Properties ####
 
@@ -45,6 +71,10 @@ snapshot_property$error = snapshot_property$value_projected/snapshot_property$va
 
 temporary_property =   subset(snapshot_property,snapshot_property$value_projected > 0) 
 mean((temporary_property$value_projected/temporary_property$value_transaction))
+
+
+
+  
 
 #### Eval Housholds ####
 

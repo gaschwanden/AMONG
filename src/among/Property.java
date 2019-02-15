@@ -18,12 +18,12 @@ public class Property implements Comparable<Property> {
 	public double value_initial;
 	public double value_previous;
 	public double value_projected;
-	public double value;
+	private double value;
 	public double value_transaction;
 	public double value_market;
 	public double value_previous_transaction;
 	public Integer timeOnMarket = 0;
-	public Integer quality = (int)(10*Math.random()) ;
+	public Integer quality = (int)(10*Math.random());
 
 	private double rent;
 	private double cost;
@@ -53,9 +53,6 @@ public class Property implements Comparable<Property> {
 		cost = value * CONST.maintenance;
 		rent = value * CONST.rentReturn;
 
-		// TODO (optionally randomize initial ownership) time_since_transaction =
-		// global.rnd.nextInt((int)CONST.investmentHorizon)*(int)CONST.year_ticks;
-		// time_since_transaction = (int)(52*Math.random());
 	}
 
 	public Property(Universe u, int time_since_transaction) {
@@ -73,15 +70,12 @@ public class Property implements Comparable<Property> {
 		cost = value * CONST.maintenance;
 		rent = value * CONST.rentReturn;
 
-		// TODO (optionally randomize initial ownership) time_since_transaction =
-		// global.rnd.nextInt((int)CONST.investmentHorizon)*(int)CONST.year_ticks;
-		// time_since_transaction = (int)(52*Math.random());
 	}
 
 	@ScheduledMethod(start = 1, interval = 1, priority = 1000)
 	public void increaseTimeSinceTransaction() {
 		time_since_transaction++;
-		value *= (1 - (CONST.propertyDevaluation / CONST.year_ticks));
+		value *= (1 - (CONST.propertyDevaluation / CONST.year_ticks)/2);//depreciation affects only the building why /2
 		if (mortgage != null) {
 			mortgage.decreaseRemainingMonths();
 		}
@@ -101,10 +95,11 @@ public class Property implements Comparable<Property> {
 		AAR = Math.pow(v / value, 1 / (time_since_transaction / CONST.year_ticks)) - 1;
 		value_previous = value;
 		value = v;
+		reservePrice = v;
 		value_previous_transaction = value_transaction;
 		value_transaction = v;
-		cost = value * CONST.maintenance;
-		rent = value * CONST.rentReturn;
+		cost = value_transaction * CONST.maintenance;
+		rent = value_transaction * CONST.rentReturn;
 	}
 
 	public void setProjectedValue(double v) {
@@ -209,13 +204,12 @@ public class Property implements Comparable<Property> {
 			}
 		}
 		localAAR = localAAR/(2*(int)h.investment_horizon);
-		reservePrice = value_transaction* Math.pow(1+localAAR, time_since_transaction);
+		reservePrice = value_transaction* Math.pow(1+localAAR, time_since_transaction/CONST.year_ticks);
 				//value_previous* Math.pow(1+localAAR, time_since_transaction);
 		if(global.rnd.nextBoolean()){
 			reservePrice *= (1-CONST.bidVariation);
 		}else{
 			reservePrice *= (1+CONST.bidVariation);
-		}
-		
+		}	
 	}
 }
