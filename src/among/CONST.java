@@ -28,7 +28,7 @@ public class CONST {
 	public static double bidIncrease = 0.2; // % to go over reserve price when bidding
 	public static double bidVariation = 0.05; // % variation in bidding price
 	public static double reducedReserve = 0.1; // % slash on reserve price when selling under pressure (assets < 0)
-	public static double reducedReserveOvertime = 20; // % slash on reserve price over time annually (assets < 0)
+	public static double reducedReserveOvertime = 0.20; // % slash on reserve price over time annually (assets < 0)
 
 	public static double minDeposit = 50000.0; // minimum assets to buy property
 

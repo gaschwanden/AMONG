@@ -34,7 +34,7 @@ public class Property implements Comparable<Property> {
 	private int time_since_transaction_previous = 0;
 	private double AAR;
 	public boolean OnMarket;
-	public double reservePrice;
+	private double reservePrice;
 
 	public Property(Universe u) {
 		global = u;
@@ -48,6 +48,7 @@ public class Property implements Comparable<Property> {
 		value_transaction = value;
 		value_market = value;
 		value_previous_transaction = value;
+		reservePrice = value*1.05;
 		AAR = 0;
 
 		cost = value * CONST.maintenance;
@@ -66,6 +67,7 @@ public class Property implements Comparable<Property> {
 		value_transaction = value;
 		value_market = value;
 		value_previous_transaction = value;
+		reservePrice = value*1.05;
 
 		cost = value * CONST.maintenance;
 		rent = value * CONST.rentReturn;
@@ -95,7 +97,8 @@ public class Property implements Comparable<Property> {
 		AAR = Math.pow(v / value, 1 / (time_since_transaction / CONST.year_ticks)) - 1;
 		value_previous = value;
 		value = v;
-		reservePrice = v;
+		setReservePrice(v);
+		value_market = v;
 		value_previous_transaction = value_transaction;
 		value_transaction = v;
 		cost = value_transaction * CONST.maintenance;
@@ -204,12 +207,20 @@ public class Property implements Comparable<Property> {
 			}
 		}
 		localAAR = localAAR/(2*(int)h.investment_horizon);
-		reservePrice = value_transaction* Math.pow(1+localAAR, time_since_transaction/CONST.year_ticks);
+		setReservePrice(value_transaction* Math.pow(1+localAAR, time_since_transaction/CONST.year_ticks));
 				//value_previous* Math.pow(1+localAAR, time_since_transaction);
 		if(global.rnd.nextBoolean()){
-			reservePrice *= (1-CONST.bidVariation);
+			setReservePrice(getReservePrice() * (1-CONST.bidVariation));
 		}else{
-			reservePrice *= (1+CONST.bidVariation);
+			setReservePrice(getReservePrice() * (1+CONST.bidVariation));
 		}	
+	}
+
+	public double getReservePrice() {
+		return reservePrice;
+	}
+
+	public void setReservePrice(double reservePrice) {
+		this.reservePrice = reservePrice;
 	}
 }

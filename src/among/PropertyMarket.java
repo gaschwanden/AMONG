@@ -72,7 +72,7 @@ public class PropertyMarket {
 //				 }
 				Bid h = b.get(0);
 				Household buyer = h.getBidder();
-				if (b.size() > 1 && b.get(1).getAmount()>a.getProperty().reservePrice) {
+				if (b.size() > 1 && b.get(1).getAmount()>a.getProperty().getReservePrice()) {
 					h = b.get(1);
 				}
 				double buying_price = h.getAmount();
@@ -90,7 +90,7 @@ public class PropertyMarket {
 //					System.out.println(" bad price");
 					
 //				}
-				if(buying_price<a.getProperty().reservePrice){
+				if(buying_price<a.getProperty().getReservePrice()){
 //					System.out.println(" bad price 2");
 					continue;
 				}
@@ -141,7 +141,7 @@ public class PropertyMarket {
 	 */
 	public void registerPropertyForSale(Household s, Property p) {
 		Integer qualy = p.quality;
-		Auction a = new Auction(s, p, p.reservePrice,qualy);
+		Auction a = new Auction(s, p, p.getReservePrice(),qualy);
 		auctions.add(a);
 	}
 	
@@ -412,14 +412,14 @@ public class PropertyMarket {
 	@ScheduledMethod(start = 1, interval = 1, priority = 991)
 
 	public void makeAverageMarketProspect(){
-		double average=0;
+		double average=VAR.propertyGrowth;
 		if(currentTickTransactionAAR.size()==0){
-			averageAAR.add(0.0);
+			averageAAR.add(VAR.propertyGrowth);
 		}else{
 		for(int i = 0; i<currentTickTransactionAAR.size();i++){
 			average =+ currentTickTransactionAAR.get(i);
 		}
-		average = average/currentTickTransactionAAR.size();
+		average = average/(currentTickTransactionAAR.size()+1);
 		averageAAR.add(average);
 		currentTickTransactionAAR.clear();
 		}

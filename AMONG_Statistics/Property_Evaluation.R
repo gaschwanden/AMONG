@@ -16,22 +16,19 @@ snapshot_property <- read_csv("~/Desktop/AMONG_2019/snapshot_property.txt", col_
 snapshot_housholds <- read_csv("~/Desktop/AMONG_2019/snapshot_housholds.txt")
 snapshot_global <- read_csv("~/Desktop/AMONG_2019/snapshot_global.txt")
 
-View(snapshot_global)
-View(snapshot_housholds)
-View(snapshot_property)
 
 
 #### EVAL individual property ####
 
-house = subset(snapshot_property,snapshot_property$ID == 5275)
+house = subset(snapshot_property,snapshot_property$ID == 4464)
 house$AAR = snapshot_global$aar
 ggplot(house, aes(tick),fill=cond) +
-  geom_line(aes(y = value, colour = "value" ))+
+  #geom_line(aes(y = value, colour = "value" ))+
   geom_line(aes(y = value_projected, colour = "value_projected" ))+
-  geom_line(aes(y = value_previous, colour = "value_previous" ))+
-   geom_line(aes(y = value_Market, colour = "value_Market" ))+
-   geom_line(aes(y = value_reseve, colour = "value_reserve" ))+
-  geom_line(aes(y = value_initial, colour = "value_initial" ))+
+  #geom_line(aes(y = value_previous, colour = "value_previous" ))+
+  # geom_line(aes(y = value_Market, colour = "value_Market" ))+
+  geom_line(aes(y = value_reseve, colour = "value_reserve" ))+
+ # geom_line(aes(y = value_initial, colour = "value_initial" ))+
   scale_color_manual(values = c("blue","green","yellow","black", "darkblue","darkgreen")) 
 
 
