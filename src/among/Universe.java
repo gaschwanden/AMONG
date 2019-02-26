@@ -131,7 +131,7 @@ public class Universe {
 			
 			for(int i =0;i<properties.size();i++){
 				Property p = properties.get(i);
-				if((int)p.getReservePrice()==0){
+				if((int)p.getReservePrice()<0){
 					System.out.println("get the fuck out of here");
 				}
 				writerProperty.println((int)tick+","
@@ -185,7 +185,7 @@ public class Universe {
 		    }
 			if(writerGlobal == null){
 				writerGlobal = new PrintWriter("snapshot_global.txt");
-				writerGlobal.println("tick,totalLiquidAssets,totalPropertyAssets,renters,owners,investors,aar,AuctionsCompleted,AuctionsRemaining,AuctionsTotal");
+				writerGlobal.println("tick,totalLiquidAssets,totalPropertyAssets,renters,owners,investors,aar,AuctionsCompleted,AuctionsRemaining,AuctionsTotal,totalRentalIncome,totalMarketValue");
 			} else{
 				writerGlobal = new PrintWriter(new FileOutputStream(new File("snapshot_global.txt"),true));
 			}
@@ -207,7 +207,6 @@ public class Universe {
 			}
 			
 			
-			
 			writerGlobal.println((int)tick+","+
 			totalLiquidAssets+"," +
 			totalPropertyAssets+"," +
@@ -217,8 +216,9 @@ public class Universe {
 			property_market.getAverageAnticipatedAnnualReturn()+","+
 			property_market.getAuctionsCompleted()+","+
 			property_market.getAuctionsRemaining()+","+
-			property_market.getAuctionsTotal()
-			
+			property_market.getAuctionsTotal()+","+
+			totalRentalMarket+","+
+			totalPropertyValues
 			);
 			writerGlobal.close();
 		}
