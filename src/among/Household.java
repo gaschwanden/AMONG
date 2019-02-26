@@ -226,11 +226,13 @@ public class Household implements Comparable<Household> {
 
 				if(p.OnMarket){
 					// Reduce Price if property has not been sold before
-					p.setReservePrice(p.getReservePrice()*Math.pow(1 - CONST.reducedReserveOvertime,1 / CONST.year_ticks));
+					double tempReserve = p.getReservePrice()*Math.pow(1 - CONST.reducedReserveOvertime,1 / CONST.year_ticks);
+					p.setReservePrice(tempReserve);
 
 				}else{
 					// calculate price for for potential sale
-					p.setReservePrice(p.getReservePrice()*Math.pow((1+p.getAAR()),1 / CONST.year_ticks));
+					double tempReserve = p.getReservePrice()*Math.pow((1+p.getAAR()),1 / CONST.year_ticks);
+					p.setReservePrice(tempReserve);
 				}
 				if (p.getTimeSinceTransaction() > investment_horizon * CONST.year_ticks - (int)(Math.random()*51) 				//selling after investment horizon
 						|| p.value_projected + 2 * global.property_market.transactionCostBuyer(p.value_projected) <= p.getMarketValue() //selling if the property has reached the anticipated return
@@ -238,7 +240,8 @@ public class Household implements Comparable<Household> {
 						) {
 		
 					if (assets < 0) { // selling at discount since under pressure
-						p.setReservePrice(p.getReservePrice() *(1- CONST.reducedReserve));
+						double tempReserve =p.getReservePrice() *Math.pow((1- CONST.reducedReserve), 1/CONST.year_ticks);
+						p.setReservePrice(tempReserve);
 					}
 
 					global.property_market.registerPropertyForSale(this, p);
@@ -264,6 +267,8 @@ public class Household implements Comparable<Household> {
 				global.property_market.registerPropertyForSale(this, propertyToSell, reserve_price);
 				return;
 			}
+			
+			// owner investors check NPV of investment decisions
 
 			if (expectation_property > CONST.stableMargin && assets > CONST.minDeposit && disposable_income > 0) {
 				double holding_cost = (projected_loan * CONST.stdVariableRate + CONST.maintenance * max_lineOfCredit
@@ -289,37 +294,25 @@ public class Household implements Comparable<Household> {
 					//					buy_expected_sale_price = affordable_price;
 				}
 			}
+			
+			// Owner/Investors check ROI of investment decision
+			
+			if(assets>CONST.minDeposit){// check if you have the money
+				for (int i = 0; i < global.property_market.getAuctions().size(); i++) {
+					 Property p = global.property_market.getAuctions().get(i).property;
+					 double localROI = p.getRent()/p.getReservePrice();
+					 if(localROI>global.alternative_market.getMarketProspect()){
+						 global.property_market.getAuctions().get(i).registerInterestToBuy(this, calculateBidByRentalReturn(p));;
+						 
+					 }
+					
+				}
+			}
+			
+			
 		}
 	}
 
-
-	//	private double calculateReservePriceLocation(Property p) {
-	//		double localAAR = 0;
-	//		for(int i = p.ID-(int)investment_horizon;i<p.ID+investment_horizon;i++){
-	//			
-	//			// Control for property array range
-	//			if(i<0){i=global.properties.size()-i;}
-	//			if(i>=global.properties.size()){i=i-global.properties.size();}
-	//
-	//			Property property = global.properties.get(i);
-	//			if(property.getAAR()>0){
-	//				System.out.println("Try");
-	//			};
-	//			localAAR += property.getAAR();
-	//			
-	//		}
-	//		localAAR = localAAR/(2*(int)investment_horizon);
-	//		
-	//		double reserve = p.value_previous* Math.pow(1+localAAR, p.time_since_transaction);
-	//		
-	//		if(global.rnd.nextBoolean()){
-	//			reserve *= (1-CONST.bidVariation);
-	//		}else{
-	//			reserve *= (1+CONST.bidVariation);
-	//		}
-	//		
-	//		return reserve;
-	//	}
 
 	@ScheduledMethod(start = 1, interval = 1, priority = 996)
 	public void executeDecision() {
@@ -346,19 +339,32 @@ public class Household implements Comparable<Household> {
 	 * @return the actual bidding price
 	 */
 
-	public double calculateBid(Property p) {
+	public double calculateBid(Property p) { 
 
+		/*
+		 * Calculation of the price is randomly choosen:
+		 * 
+		 * 1. Average variable Historical Development
+		 * 2. Last transaction and average price development
+		 * 3. Last transaction and individual price development
+		 * 4. Looking of at the price development of the neighborhood
+		 * 5. Calculating ROI based on Rental Yield
+		 * 
+		 */
+		
 		double actual_bid = 0;
-
 		double probablity = Math.random();
+		
 		if(probablity<0.1){
-			actual_bid = calculateBidByTime(p)+calculateNPVtaxDeduction(p);
+			actual_bid = 	calculateBidByTime(p)		+calculateNPVtaxDeduction(p);
 		}else if(probablity<0.3) {
-			actual_bid = p.value_previous_transaction*Math.pow(1+VAR.propertyGrowth, (p.time_since_transaction/CONST.year_ticks));
+			actual_bid = 	p.value_previous_transaction*Math.pow(1+VAR.propertyGrowth, (p.time_since_transaction/CONST.year_ticks));
 		}else if(probablity<0.6) {
-			actual_bid = calculateBidByMarketValue(p)+calculateNPVtaxDeduction(p); 		 
+			actual_bid = 	calculateBidByMarketValue(p)	+calculateNPVtaxDeduction(p); 	
+		}else if(probablity<0.7) {
+			actual_bid = 	calculateBidByNeighbors(p) 	+ calculateNPVtaxDeduction(p);
 		}else{
-			actual_bid = calculateBidByRentalReturn(p)+calculateNPVtaxDeduction(p);
+			actual_bid = 	calculateBidByRentalReturn(p)	+calculateNPVtaxDeduction(p);
 		}
 		return actual_bid;
 	}
@@ -387,39 +393,39 @@ public class Household implements Comparable<Household> {
 		return NPVtotalDeductions;
 	}
 
-	//	private double calculateBidByNeighbors(Property p) {
-	//
-	//		double actual_bid = 0;
-	//		double rate = 0;
-	//		int iteratorCounter = 0;
-	//		for (int i = p.ID - 10; i < p.ID + 10; i++) {
-	//			double localRate = -999;
-	//			if (i == p.ID)
-	//				continue;
-	//
-	//			// Properties are arranged in a circular manner where the last is adjecant to
-	//			// the first in the list
-	//			if (i < 0)
-	//				i = global.properties.size() - i;
-	//			if (i >= global.properties.size()) {
-	//				localRate = global.properties.get(i - global.properties.size()).getAAR();
-	//			} else {
-	//				localRate = global.properties.get(i).getAAR();
-	//			}
-	//
-	//			if (localRate != -999) {
-	//				rate += localRate;
-	//				iteratorCounter++;
-	//			}
-	//		}
-	//		if (iteratorCounter > 1) {
-	//			rate = rate / iteratorCounter;
-	//		} else {
-	//			rate = CONST.rentReturn;
-	//		}
-	//		actual_bid = p.getValuePrevious() * Math.pow(1 + rate, p.time_since_transaction / CONST.year_ticks);
-	//		return actual_bid;
-	//	}
+	private double calculateBidByNeighbors(Property p) {
+	
+			double actual_bid = 0;
+			double rate = 0;
+			int iteratorCounter = 0;
+			for (int i = p.ID - 10; i < p.ID + 10; i++) {
+				double localRate = -999;
+				if (i == p.ID)
+					continue;
+	
+				// Properties are arranged in a circular manner where the last is adjecant to
+				// the first in the list
+				if (i < 0)
+					i = global.properties.size() - i;
+				if (i >= global.properties.size()) {
+					localRate = global.properties.get(i - global.properties.size()).getAAR();
+				} else {
+					localRate = global.properties.get(i).getAAR();
+				}
+	
+				if (localRate != -999) {
+					rate += localRate;
+					iteratorCounter++;
+				}
+			}
+			if (iteratorCounter > 1) {
+				rate = rate / iteratorCounter;
+			} else {
+				rate = CONST.rentReturn;
+			}
+			actual_bid = p.getValuePrevious() * Math.pow(1 + rate, p.time_since_transaction / CONST.year_ticks);
+			return actual_bid;
+		}
 
 	private double calculateBidByTime(Property p) {
 		boolean optimist = global.rnd.nextBoolean();
@@ -482,10 +488,10 @@ public class Household implements Comparable<Household> {
 		projectedValue = p.value_previous_transaction*Math.pow((1+averageAAR),investment_horizon);
 
 		if(averageAAR<0){
-			System.out.println("hello World 2");
+			System.out.println("hello World verageAAR<0");
 		}
 		if(projectedValue>2*p.getValue() ){
-			System.out.println("hello World 1");
+			System.out.println("hello World projectedValue>2*p.getValue()");
 		}
 		return projectedValue;
 	}
@@ -495,6 +501,7 @@ public class Household implements Comparable<Household> {
 	 * @param p
 	 *            The Property to be removed from the list of owned Properties.
 	 */
+	
 	public void removeProperty(Property p) {
 		housholdProperties.remove(p);
 		Collections.sort(housholdProperties);
@@ -563,6 +570,7 @@ public class Household implements Comparable<Household> {
 	 * Getter
 	 * @return The list of Properties owned by this Household.
 	 */
+	
 	public ArrayList<Property> getProperties() {
 		return housholdProperties;
 	}

@@ -172,7 +172,7 @@ public class PropertyMarket {
 			seller.removeProperty(p);
 		}
 		p.transactions++;
-		p.setValue(b);
+		p.setPropertyValueTransaction(b);
 		p.resetTimeSinceTransaction();
 		buyer.addProperty(p);
 
@@ -378,7 +378,7 @@ public class PropertyMarket {
 
 	public double getAverageMarketProspectAt (int time){
 		if((int)global.tick-time<0){
-			return 0.07;
+			return VAR.propertyGrowth;
 		}else{
 			return averageAAR.get((int)global.tick-time);
 		}
@@ -398,7 +398,7 @@ public class PropertyMarket {
 		for(int i = 0; i<timeperiod;i++){
 			int index = averageAAR.size()-timeperiod+i;
 			if(index<0){
-				average = average + 0.07;
+				average = average + VAR.propertyGrowth;
 			}else{
 				average = average + averageAAR.get(index);//+magnitude;
 			}

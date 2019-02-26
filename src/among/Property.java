@@ -18,7 +18,7 @@ public class Property implements Comparable<Property> {
 	public double value_initial;
 	public double value_previous;
 	public double value_projected;
-	private double value;
+	private double propertyValueTransaction;
 	public double value_transaction;
 	public double value_market;
 	public double value_previous_transaction;
@@ -40,19 +40,19 @@ public class Property implements Comparable<Property> {
 		global = u;
 		ID = CONST.property_ID;
 		CONST.property_ID++;
-		value = global.property_values.Sample1(global.rnd);
+		propertyValueTransaction = global.property_values.Sample1(global.rnd);
 
-		value_initial = value;
-		value_previous = value;
-		value_projected = value;
-		value_transaction = value;
-		value_market = value;
-		value_previous_transaction = value;
-		reservePrice = value*1.05;
+		value_initial = propertyValueTransaction;
+		value_previous = propertyValueTransaction;
+		value_projected = propertyValueTransaction;
+		value_transaction = propertyValueTransaction;
+		value_market = propertyValueTransaction;
+		value_previous_transaction = propertyValueTransaction;
+		reservePrice = propertyValueTransaction*1.05;
 		AAR = 0;
 
-		cost = value * CONST.maintenance;
-		rent = value * CONST.rentReturn;
+		cost = propertyValueTransaction * CONST.maintenance;
+		rent = propertyValueTransaction * CONST.rentReturn;
 
 	}
 
@@ -60,24 +60,24 @@ public class Property implements Comparable<Property> {
 		global = u;
 		ID = CONST.property_ID;
 		CONST.property_ID++;
-		value = global.property_values.Sample1(global.rnd);
-		value_initial = value;
-		value_previous = value;
-		value_projected = value;
-		value_transaction = value;
-		value_market = value;
-		value_previous_transaction = value;
-		reservePrice = value*1.05;
+		propertyValueTransaction = global.property_values.Sample1(global.rnd);
+		value_initial = propertyValueTransaction;
+		value_previous = propertyValueTransaction;
+		value_projected = propertyValueTransaction;
+		value_transaction = propertyValueTransaction;
+		value_market = propertyValueTransaction;
+		value_previous_transaction = propertyValueTransaction;
+		reservePrice = propertyValueTransaction*(1 + VAR.propertyGrowth+VAR.inflation);
 
-		cost = value * CONST.maintenance;
-		rent = value * CONST.rentReturn;
+		cost = propertyValueTransaction * CONST.maintenance;
+		rent = propertyValueTransaction * CONST.rentReturn;
 
 	}
 
 	@ScheduledMethod(start = 1, interval = 1, priority = 1000)
 	public void increaseTimeSinceTransaction() {
 		time_since_transaction++;
-		value *= (1 - (CONST.propertyDevaluation / CONST.year_ticks)/2);//depreciation affects only the building why /2
+		propertyValueTransaction *= (1 - (CONST.propertyDevaluation / CONST.year_ticks)/2);//depreciation affects only the building why /2
 		if (mortgage != null) {
 			mortgage.decreaseRemainingMonths();
 		}
@@ -93,11 +93,11 @@ public class Property implements Comparable<Property> {
 		timeOnMarket++;
 	}
 
-	public void setValue(double v) {
-		AAR = Math.pow(v / value, 1 / (time_since_transaction / CONST.year_ticks)) - 1;
-		value_previous = value;
-		value = v;
-		setReservePrice(v);
+	public void setPropertyValueTransaction(double v) {
+		AAR = Math.pow(v / propertyValueTransaction, 1 / (time_since_transaction / CONST.year_ticks)) - 1;
+		value_previous = propertyValueTransaction;
+		propertyValueTransaction = v;
+		setReservePrice(v*(1+VAR.inflation+VAR.propertyGrowth));
 		value_market = v;
 		value_previous_transaction = value_transaction;
 		value_transaction = v;
@@ -136,7 +136,7 @@ public class Property implements Comparable<Property> {
 	 * @return The current value of the property
 	 */
 	public double getValue() {
-		return value;
+		return propertyValueTransaction;
 	}
 
 	public double getTransationValue() {
