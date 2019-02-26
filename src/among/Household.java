@@ -29,7 +29,7 @@ public class Household implements Comparable<Household> {
 	private double in_rent;
 
 	private double out_living;
-	private double ongoing_cost_rent;
+	public double ongoing_cost_rent;
 	private double out_cost;
 	public int incomeDecile;
 
@@ -302,7 +302,10 @@ public class Household implements Comparable<Household> {
 					 Property p = global.property_market.getAuctions().get(i).property;
 					 double localROI = p.getRent()/p.getReservePrice();
 					 if(localROI>global.alternative_market.getMarketProspect()){
-						 global.property_market.getAuctions().get(i).registerInterestToBuy(this, calculateBidByRentalReturn(p));;
+						 double localBid = calculateBidByRentalReturn(p);
+						 boolean bankApproval = global.bank.testBid(p,localBid);
+						 
+						 if(bankApproval)global.property_market.getAuctions().get(i).registerInterestToBuy(this,localBid );
 						 
 					 }
 					
@@ -322,7 +325,9 @@ public class Household implements Comparable<Household> {
 				if (a.getReservePrice() <= buy_affordable_price && Math.random()<0.1) { // can the household afford it && limiting ability to bid in all auctions
 					double actual_bid = calculateBid(a.property);
 					if (actual_bid <= buy_affordable_price ) {
-						a.registerInterestToBuy(this, actual_bid);
+						boolean bankApproval = global.bank.testBid(a.property,actual_bid);
+						if(bankApproval)a.registerInterestToBuy(this, actual_bid);
+						
 					} else {
 						disapointedHoushold = true;
 					}
@@ -370,7 +375,7 @@ public class Household implements Comparable<Household> {
 	}
 
 	private double calculateBidByRentalReturn(Property p) {
-		return 100*(p.getRent()-p.getCost())/(VAR.irMortgage+CONST.maintenance); //calculating by ROI
+		return (p.getRent()-p.getCost())/(VAR.irMortgage+CONST.maintenance); //calculating by ROI
 	}
 
 	private double calculateBidByMarketValue(Property p) {

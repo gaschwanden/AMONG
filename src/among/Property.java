@@ -150,6 +150,9 @@ public class Property implements Comparable<Property> {
 	public double getRent() {
 		return rent;
 	}
+	public void setRent(double rentSetter){
+		rent = rentSetter;
+	}
 
 	public double getCost() {
 		return cost;

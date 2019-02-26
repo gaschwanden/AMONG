@@ -90,4 +90,15 @@ public class Bank {
 	public void setTotalCredit_paid(double credit_paid) {
 		this.credit_paid = credit_paid;
 	}
+
+	public boolean testBid(Property p, double localBid) {
+		
+		if(1.1*p.getMarketValue()>localBid){ 
+			return true;}
+		else{
+			return false;
+		}
+		
+		
+	}
 }

@@ -64,6 +64,8 @@ public class Universe {
 	private PrintWriter writerProperty;
 	private PrintWriter writerHousholds;
 	private PrintWriter writerGlobal;
+	private int totalPropertyValues;
+	private double totalRentalMarket;
 
 	public Universe(long seed) {
 		rnd = new Random(seed);
@@ -351,10 +353,27 @@ public class Universe {
 			VAR.wageGrowth = params.getDouble("incomeMagnitude");
 		}
 
+		updateRentValues();
+		
 		if (tick > 1) {
-			updatePropertyMarketValue();
+			updatePropertyMarketValue();	
 		}
 	}
+
+	private void updateRentValues() {
+		totalRentalMarket = 0;
+		totalPropertyValues = 0;
+		for (Household h : households ){
+			totalRentalMarket+=h.ongoing_cost_rent;
+		}
+		for (Property p : properties){
+			totalPropertyValues += p.getMarketValue();
+		}
+		for (Property p : properties){
+			double rentSetter = (p.getMarketValue()*totalRentalMarket)/totalPropertyValues;
+			p.setRent(rentSetter);
+		}	
+}
 
 	private void updatePropertyMarketValue() {
 		property_market.makeAverageAnticipatedAnnualReturn();
